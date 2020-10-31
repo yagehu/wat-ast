@@ -1,7 +1,7 @@
 [package]
 name = "wat-ast"
 version = "0.1.0"
-authors = ["Yage Hu <yagehu@qq.com>"]
+authors = ["Yage Hu <yagejhu@@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
