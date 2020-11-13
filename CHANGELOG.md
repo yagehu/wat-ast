@@ -7,4 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2020-11-13
+### Added
+- `instructions` macro export.
+
 [Unreleased]: https://github.com/yagehu/wat-ast/compare/v0.2.1...HEAD
+[0.2.2]: https://github.com/yagehu/wat-ast/compare/v0.2.1...v0.2.2
