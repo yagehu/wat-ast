@@ -14,3 +14,21 @@ impl<'a> Parse<'a> for Document<'a> {
         Ok(Self { module })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn empty_module() {
+        assert_eq!(
+            wast::parser::parse::<Document>(
+                &wast::parser::ParseBuffer::new("(module)").unwrap()
+            )
+            .unwrap(),
+            Document {
+                module: Module { sections: vec![] },
+            },
+        )
+    }
+}

@@ -4,7 +4,7 @@ use crate::Section;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Module<'a> {
-    sections: Vec<Section<'a>>,
+    pub sections: Vec<Section<'a>>,
 }
 
 impl<'a> Parse<'a> for Module<'a> {
