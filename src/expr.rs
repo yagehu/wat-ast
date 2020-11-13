@@ -88,6 +88,7 @@ impl<'a> ExpressionParser<'a> {
     }
 }
 
+#[macro_export]
 macro_rules! instructions {
     (pub enum Instruction<'a> {
         $(
