@@ -1,6 +1,6 @@
 pub use document::Document;
 pub use export::Export;
-pub use expr::{Expression, ExpressionParser};
+pub use expr::{Expression, ExpressionParser, Instruction};
 pub use identifier::{Identifier, Identifiers};
 pub use import_desc::{ImportDesc, ImportDescFunc};
 pub use integer::Integer;
