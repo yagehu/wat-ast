@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2020-11-19
+### Changed
+- Change the interface of `Integer`. It has been brought more in line with
+  `wast` crate's definition.
+
 ## [0.2.3] - 2020-11-13
 ### Added
 - `Instruction` type export.
@@ -16,5 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `instructions` macro export.
 
 [Unreleased]: https://github.com/yagehu/wat-ast/compare/v0.2.1...HEAD
+[0.3.0]: https://github.com/yagehu/wat-ast/compare/v0.2.3...v0.3.0
 [0.2.3]: https://github.com/yagehu/wat-ast/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/yagehu/wat-ast/compare/v0.2.1...v0.2.2
