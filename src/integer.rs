@@ -2,8 +2,28 @@ use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Integer<'a> {
-    pub sign: Option<Sign>,
-    pub src: &'a str,
+    sign: Option<Sign>,
+    src: &'a str,
+    val: &'a str,
+    hex: bool,
+}
+
+impl<'a> Integer<'a> {
+    /// Returns the sign token for this integer.
+    pub fn sign(&self) -> Option<Sign> {
+        self.sign
+    }
+
+    /// Returns the original source text for this integer.
+    pub fn src(&self) -> &'a str {
+        self.src
+    }
+
+    /// Returns the value string that can be parsed for this integer, as well as
+    /// the base that it should be parsed in
+    pub fn val(&self) -> (&str, u32) {
+        (&self.val, if self.hex { 16 } else { 10 })
+    }
 }
 
 impl<'a> Parse<'a> for Integer<'a> {
@@ -12,6 +32,8 @@ impl<'a> Parse<'a> for Integer<'a> {
             Some((s, cur)) => {
                 let src = s.src();
                 let mut sign = None;
+                let (val, base) = s.val();
+                let hex = if base == 16 { true } else { false };
 
                 if let Some(si) = s.sign() {
                     match si {
@@ -20,7 +42,15 @@ impl<'a> Parse<'a> for Integer<'a> {
                     }
                 }
 
-                Ok((Self { sign, src }, cur))
+                Ok((
+                    Self {
+                        sign,
+                        src,
+                        val,
+                        hex,
+                    },
+                    cur,
+                ))
             }
             None => Err(parser.error("could not parse integer")),
         })
@@ -37,7 +67,7 @@ impl Peek for Integer<'_> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Copy, Debug, Clone, PartialEq, Eq)]
 pub enum Sign {
     Pos,
     Neg,
