@@ -1,8 +1,8 @@
 use wast::parser::{Parse, Parser, Result};
 
 use crate::{
-    Export, Expression, ExpressionParser, FuncType, GlobalType, Identifier,
-    ImportDesc, MemType, TypeUse,
+    Export, Expression, ExpressionParser, FuncType, GlobalType, ImportDesc,
+    Index, MemType, TypeUse,
 };
 
 /// https://webassembly.github.io/spec/core/text/modules.html#text-module
@@ -63,7 +63,7 @@ impl<'a> Parse<'a> for TypeSection<'a> {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeSectionEntry<'a> {
-    pub id: Option<Identifier<'a>>,
+    pub idx: Option<Index<'a>>,
     pub func_type: FuncType,
 }
 
@@ -71,10 +71,10 @@ impl<'a> Parse<'a> for TypeSectionEntry<'a> {
     fn parse(parser: Parser<'a>) -> Result<Self> {
         parser.parse::<wast::kw::r#type>()?;
 
-        let id = parser.parse::<Option<Identifier>>()?;
+        let idx = parser.parse::<Option<Index>>()?;
         let func_type = parser.parens(|p| p.parse::<FuncType>())?;
 
-        Ok(Self { id, func_type })
+        Ok(Self { idx, func_type })
     }
 }
 
@@ -141,7 +141,7 @@ impl<'a> Parse<'a> for FunctionSection<'a> {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FunctionSectionEntry<'a> {
-    pub id: Identifier<'a>,
+    pub idx: Index<'a>,
     pub export: Option<Export<'a>>,
     pub type_use: TypeUse<'a>,
     pub exprs: Vec<Expression<'a>>,
@@ -151,7 +151,7 @@ impl<'a> Parse<'a> for FunctionSectionEntry<'a> {
     fn parse(parser: Parser<'a>) -> Result<Self> {
         parser.parse::<wast::kw::func>()?;
 
-        let id = parser.parse::<Identifier>()?;
+        let idx = parser.parse::<Index>()?;
         let mut export = None;
 
         if parser.peek2::<wast::kw::export>() {
@@ -163,7 +163,7 @@ impl<'a> Parse<'a> for FunctionSectionEntry<'a> {
         let exprs = expressions_parser.parse(parser)?;
 
         Ok(Self {
-            id,
+            idx,
             export,
             type_use,
             exprs,
@@ -194,7 +194,7 @@ impl<'a> Parse<'a> for MemorySection<'a> {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MemorySectionEntry<'a> {
-    pub id: Option<Identifier<'a>>,
+    pub idx: Option<Index<'a>>,
     pub export: Option<Export<'a>>,
     pub mem_type: MemType<'a>,
 }
@@ -203,7 +203,7 @@ impl<'a> Parse<'a> for MemorySectionEntry<'a> {
     fn parse(parser: Parser<'a>) -> Result<Self> {
         parser.parse::<wast::kw::memory>()?;
 
-        let id = parser.parse::<Option<Identifier>>()?;
+        let idx = parser.parse::<Option<Index>>()?;
         let mut export = None;
 
         if parser.peek2::<wast::kw::export>() {
@@ -213,7 +213,7 @@ impl<'a> Parse<'a> for MemorySectionEntry<'a> {
         let mem_type = parser.parse::<MemType>()?;
 
         Ok(Self {
-            id,
+            idx,
             export,
             mem_type,
         })
@@ -243,7 +243,7 @@ impl<'a> Parse<'a> for GlobalSection<'a> {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GlobalSectionEntry<'a> {
-    pub id: Option<Identifier<'a>>,
+    pub idx: Option<Index<'a>>,
     pub export: Option<Export<'a>>,
     pub global_type: GlobalType,
     pub expr: Expression<'a>,
@@ -253,7 +253,7 @@ impl<'a> Parse<'a> for GlobalSectionEntry<'a> {
     fn parse(parser: Parser<'a>) -> Result<Self> {
         parser.parse::<wast::kw::global>()?;
 
-        let id = parser.parse::<Option<Identifier>>()?;
+        let idx = parser.parse::<Option<Index>>()?;
         let mut export = None;
 
         if parser.peek2::<wast::kw::export>() {
@@ -270,7 +270,7 @@ impl<'a> Parse<'a> for GlobalSectionEntry<'a> {
         let expr = exprs.pop().unwrap();
 
         Ok(Self {
-            id,
+            idx,
             export,
             global_type,
             expr,
@@ -357,7 +357,7 @@ impl<'a> Parse<'a> for DataString<'a> {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DataSectionEntry<'a> {
-    pub id: Option<Identifier<'a>>,
+    pub idx: Option<Index<'a>>,
     pub offset: Offset<'a>,
     pub data_string: DataString<'a>,
 }
@@ -366,12 +366,12 @@ impl<'a> Parse<'a> for DataSectionEntry<'a> {
     fn parse(parser: Parser<'a>) -> Result<Self> {
         parser.parse::<wast::kw::data>()?;
 
-        let id = parser.parse::<Option<Identifier>>()?;
+        let idx = parser.parse::<Option<Index>>()?;
         let offset = parser.parse::<Offset>()?;
         let data_string = parser.parse::<DataString>()?;
 
         Ok(Self {
-            id,
+            idx,
             offset,
             data_string,
         })

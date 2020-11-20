@@ -1,6 +1,6 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{Identifier, Identifiers, Integer, ValueType};
+use crate::{Index, Integer, ValueType};
 
 enum Paren {
     None,
@@ -166,14 +166,14 @@ macro_rules! instructions {
 
 instructions!(
     pub enum Instruction<'a> {
-        Block     : block      : "block"      { id: Option<Identifier<'a>> },
-        Br        : br         : "br"         { id: Identifier<'a> },
-        BrIf      : br_if      : "br_if"      { id: Identifier<'a> },
-        BrTable   : br_table   : "br_table"   { ids: Identifiers<'a> },
-        Call      : call       : "call"       { id: Identifier<'a> },
+        Block     : block      : "block"      { id: Option<Index<'a>> },
+        Br        : br         : "br"         { id: Index<'a> },
+        BrIf      : br_if      : "br_if"      { id: Index<'a> },
+        BrTable   : br_table   : "br_table"   { ids: Index<'a> },
+        Call      : call       : "call"       { id: Index<'a> },
         Drop      : drop       : "drop"       {},
-        GlobalGet : global_get : "global.get" { id: Identifier<'a> },
-        GlobalSet : global_set : "global.set" { id: Identifier<'a> },
+        GlobalGet : global_get : "global.get" { id: Index<'a> },
+        GlobalSet : global_set : "global.set" { id: Index<'a> },
         I32Add    : i32_add    : "i32.add"    {},
         I32Const  : i32_const  : "i32.const"  { integer: Integer<'a> },
         I32Eq     : i32_eq     : "i32.eq"     {},
@@ -183,11 +183,11 @@ instructions!(
         I32Sub    : i32_sub    : "i32.sub"    {},
         I64Const  : i64_const  : "i64.const"  { integer: Integer<'a> },
         If        : r#if       : "if"         {},
-        Local     : local      : "local"      { id: Identifier<'a>, value_type: ValueType },
-        LocalGet  : local_get  : "local.get"  { id: Identifier<'a> },
-        LocalSet  : local_set  : "local.set"  { id: Identifier<'a> },
-        LocalTee  : local_tee  : "local.tee"  { id: Identifier<'a> },
-        Loop      : r#loop     : "loop"       { id: Option<Identifier<'a>> },
+        Local     : local      : "local"      { id: Index<'a>, value_type: ValueType },
+        LocalGet  : local_get  : "local.get"  { id: Index<'a> },
+        LocalSet  : local_set  : "local.set"  { id: Index<'a> },
+        LocalTee  : local_tee  : "local.tee"  { id: Index<'a> },
+        Loop      : r#loop     : "loop"       { id: Option<Index<'a>> },
         Then      : then       : "then"       {},
     }
 );

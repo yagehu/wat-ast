@@ -1,6 +1,6 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{Identifier, TypeUse};
+use crate::{Index, TypeUse};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ImportDesc<'a> {
@@ -22,7 +22,7 @@ impl<'a> Parse<'a> for ImportDesc<'a> {
 /// https://webassembly.github.io/spec/core/text/modules.html#text-importdesc
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImportDescFunc<'a> {
-    pub id: Option<Identifier<'a>>,
+    pub id: Option<Index<'a>>,
     pub type_use: TypeUse<'a>,
 }
 
@@ -30,7 +30,7 @@ impl<'a> Parse<'a> for ImportDescFunc<'a> {
     fn parse(parser: Parser<'a>) -> Result<Self> {
         parser.parse::<wast::kw::func>()?;
 
-        let id = parser.parse::<Option<Identifier>>()?;
+        let id = parser.parse::<Option<Index>>()?;
         let type_use = parser.parse::<TypeUse>()?;
 
         Ok(Self { id, type_use })

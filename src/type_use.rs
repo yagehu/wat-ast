@@ -1,6 +1,6 @@
 use wast::parser::{self, Parse, Parser};
 
-use crate::{Identifier, Param, Result};
+use crate::{Index, Param, Result};
 
 /// https://webassembly.github.io/spec/core/text/modules.html#text-typeuse
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -47,15 +47,15 @@ impl<'a> Parse<'a> for TypeUse<'a> {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Type<'a> {
-    pub id: Identifier<'a>,
+    pub idx: Index<'a>,
 }
 
 impl<'a> Parse<'a> for Type<'a> {
     fn parse(parser: Parser<'a>) -> parser::Result<Self> {
         parser.parse::<wast::kw::r#type>()?;
 
-        let id = parser.parse::<Identifier>()?;
+        let idx = parser.parse::<Index>()?;
 
-        Ok(Self { id })
+        Ok(Self { idx })
     }
 }
