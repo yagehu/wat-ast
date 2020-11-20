@@ -3,7 +3,7 @@ pub use export::Export;
 pub use expr::{Expression, ExpressionParser, Instruction};
 pub use import_desc::{ImportDesc, ImportDescFunc};
 pub use index::{Index, Indexes, SymbolicIndex};
-pub use integer::Integer;
+pub use integer::{Integer, Sign};
 pub use module::Module;
 pub use param::Param;
 pub use result::Result;

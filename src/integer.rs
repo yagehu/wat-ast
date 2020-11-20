@@ -9,6 +9,20 @@ pub struct Integer<'a> {
 }
 
 impl<'a> Integer<'a> {
+    pub fn new(
+        sign: Option<Sign>,
+        src: &'a str,
+        val: &'a str,
+        hex: bool,
+    ) -> Self {
+        Self {
+            sign,
+            src,
+            val,
+            hex,
+        }
+    }
+
     /// Returns the sign token for this integer.
     pub fn sign(&self) -> Option<Sign> {
         self.sign
