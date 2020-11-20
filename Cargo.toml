@@ -1,10 +1,11 @@
 [package]
 name = "wat-ast"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["Yage Hu <yagejhu@gmail.com>"]
 edition = "2018"
 license = "GPL-3.0-or-later"
 description = "WebAssembly text format (.wat) abstract syntax tree for generating human readable code."
+repository = "https://github.com/yagehu/wat-ast"
 
 [dependencies]
 wast = { version = "26.0", default-features = false }
