@@ -67,13 +67,13 @@ impl Parse<'_> for FuncType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Limits<'a> {
-    pub min: Integer<'a>,
-    pub max: Option<Integer<'a>>,
+pub struct Limits {
+    pub min: Integer,
+    pub max: Option<Integer>,
 }
 
-impl<'a> Parse<'a> for Limits<'a> {
-    fn parse(parser: Parser<'a>) -> parser::Result<Self> {
+impl Parse<'_> for Limits {
+    fn parse(parser: Parser<'_>) -> parser::Result<Self> {
         let min = parser.parse::<Integer>()?;
         let max = parser.parse::<Option<Integer>>()?;
 
@@ -82,12 +82,12 @@ impl<'a> Parse<'a> for Limits<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MemType<'a> {
-    pub lim: Limits<'a>,
+pub struct MemType {
+    pub lim: Limits,
 }
 
-impl<'a> Parse<'a> for MemType<'a> {
-    fn parse(parser: Parser<'a>) -> parser::Result<Self> {
+impl Parse<'_> for MemType {
+    fn parse(parser: Parser<'_>) -> parser::Result<Self> {
         let lim = parser.parse::<Limits>()?;
 
         Ok(Self { lim })

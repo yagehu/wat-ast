@@ -1,18 +1,18 @@
 use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Integer<'a> {
+pub struct Integer {
     sign: Option<Sign>,
-    src: &'a str,
-    val: &'a str,
+    src: String,
+    val: String,
     hex: bool,
 }
 
-impl<'a> Integer<'a> {
+impl Integer {
     pub fn new(
         sign: Option<Sign>,
-        src: &'a str,
-        val: &'a str,
+        src: String,
+        val: String,
         hex: bool,
     ) -> Self {
         Self {
@@ -29,8 +29,8 @@ impl<'a> Integer<'a> {
     }
 
     /// Returns the original source text for this integer.
-    pub fn src(&self) -> &'a str {
-        self.src
+    pub fn src(&self) -> &str {
+        &self.src
     }
 
     /// Returns the value string that can be parsed for this integer, as well as
@@ -40,13 +40,14 @@ impl<'a> Integer<'a> {
     }
 }
 
-impl<'a> Parse<'a> for Integer<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for Integer {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.step(|cursor| match cursor.integer() {
             Some((s, cur)) => {
-                let src = s.src();
+                let src = s.src().to_owned();
                 let mut sign = None;
-                let (val, base) = s.val();
+                let (val_ref, base) = s.val();
+                let val = val_ref.to_owned();
                 let hex = if base == 16 { true } else { false };
 
                 if let Some(si) = s.sign() {
@@ -71,7 +72,7 @@ impl<'a> Parse<'a> for Integer<'a> {
     }
 }
 
-impl Peek for Integer<'_> {
+impl Peek for Integer {
     fn peek(cursor: Cursor<'_>) -> bool {
         cursor.integer().is_some()
     }

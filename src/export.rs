@@ -3,16 +3,16 @@ use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 use crate::FunctionSectionEntry;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Export<'a> {
-    pub name: &'a str,
-    pub desc: Option<ExportDesc<'a>>,
+pub struct Export {
+    pub name: String,
+    pub desc: Option<ExportDesc>,
 }
 
-impl<'a> Parse<'a> for Export<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for Export {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::export>()?;
 
-        let name = parser.parse::<&str>()?;
+        let name = parser.parse::<String>()?;
         let mut desc = None;
 
         if !parser.is_empty() {
@@ -23,7 +23,7 @@ impl<'a> Parse<'a> for Export<'a> {
     }
 }
 
-impl Peek for Export<'_> {
+impl Peek for Export {
     fn peek(cursor: Cursor<'_>) -> bool {
         cursor.integer().is_some()
     }
@@ -34,16 +34,18 @@ impl Peek for Export<'_> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ExportDesc<'a> {
-    Func(Box<FunctionSectionEntry<'a>>),
+pub enum ExportDesc {
+    Func(Box<FunctionSectionEntry>),
 }
 
-impl<'a> Parse<'a> for ExportDesc<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for ExportDesc {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut l = parser.lookahead1();
 
         if l.peek::<wast::kw::func>() {
-            Ok(Self::Func(Box::new(parser.parse::<FunctionSectionEntry>()?)))
+            Ok(Self::Func(Box::new(
+                parser.parse::<FunctionSectionEntry>()?,
+            )))
         } else {
             Err(l.error())
         }

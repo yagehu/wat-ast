@@ -9,19 +9,19 @@ enum Paren {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Level<'a> {
-    pub expr: Expression<'a>,
-    pub subexprs: Vec<Expression<'a>>,
+pub struct Level {
+    pub expr: Expression,
+    pub subexprs: Vec<Expression>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Expression<'a> {
-    Unfolded(Instruction<'a>),
-    Folded(Instruction<'a>),
+pub enum Expression {
+    Unfolded(Instruction),
+    Folded(Instruction),
 }
 
-impl<'a> Expression<'a> {
-    fn subexprs(&mut self) -> &mut Vec<Expression<'a>> {
+impl Expression {
+    fn subexprs(&mut self) -> &mut Vec<Expression> {
         match self {
             Self::Unfolded(i) => i.subexprs(),
             Self::Folded(i) => i.subexprs(),
@@ -30,13 +30,13 @@ impl<'a> Expression<'a> {
 }
 
 #[derive(Default)]
-pub struct ExpressionParser<'a> {
-    exprs: Vec<Expression<'a>>,
-    stack: Vec<Level<'a>>,
+pub struct ExpressionParser {
+    exprs: Vec<Expression>,
+    stack: Vec<Level>,
 }
 
-impl<'a> ExpressionParser<'a> {
-    pub fn parse(mut self, parser: Parser<'a>) -> Result<Vec<Expression<'a>>> {
+impl ExpressionParser {
+    pub fn parse(mut self, parser: Parser) -> Result<Vec<Expression>> {
         while !parser.is_empty() || !self.stack.is_empty() {
             match self.paren(parser)? {
                 Paren::Left => {
@@ -74,7 +74,7 @@ impl<'a> ExpressionParser<'a> {
     }
 
     /// Parses either `(`, `)`, or nothing.
-    fn paren(&self, parser: Parser<'a>) -> Result<Paren> {
+    fn paren(&self, parser: Parser) -> Result<Paren> {
         parser.step(|cursor| {
             Ok(match cursor.lparen() {
                 Some(rest) => (Paren::Left, rest),
@@ -90,7 +90,7 @@ impl<'a> ExpressionParser<'a> {
 
 #[macro_export]
 macro_rules! instructions {
-    (pub enum Instruction<'a> {
+    (pub enum Instruction {
         $(
             $name:ident : $keyword:tt : $instr:tt {
                 $($field_name:ident: $field_type:ty),*
@@ -104,15 +104,15 @@ macro_rules! instructions {
         }
 
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub enum Instruction<'a> {
+        pub enum Instruction {
             $(
-                $name($name<'a>),
+                $name($name),
             )*
         }
 
 
-        impl<'a> Instruction<'a> {
-            pub fn subexprs(&mut self) -> &mut Vec<Expression<'a>> {
+        impl Instruction {
+            pub fn subexprs(&mut self) -> &mut Vec<Expression> {
                 match self {
                     $(
                         Self::$name(i) => &mut i.exprs,
@@ -121,8 +121,8 @@ macro_rules! instructions {
             }
         }
 
-        impl<'a> Parse<'a> for Instruction<'a> {
-            fn parse(parser: Parser<'a>) -> Result<Self> {
+        impl Parse<'_> for Instruction {
+            fn parse(parser: Parser<'_>) -> Result<Self> {
                 let mut l = parser.lookahead1();
 
                 $(
@@ -137,15 +137,15 @@ macro_rules! instructions {
 
         $(
             #[derive(Debug, Clone, PartialEq, Eq)]
-            pub struct $name<'a> {
+            pub struct $name {
                 $(
                     pub $field_name: $field_type,
                 )*
-                pub exprs: Vec<Expression<'a>>,
+                pub exprs: Vec<Expression>,
             }
 
-            impl<'a> Parse<'a> for $name<'a> {
-                fn parse(parser: Parser<'a>) -> Result<Self> {
+            impl Parse<'_> for $name {
+                fn parse(parser: Parser<'_>) -> Result<Self> {
                     parser.parse::<kw::$keyword>()?;
 
                     $(
@@ -165,29 +165,29 @@ macro_rules! instructions {
 }
 
 instructions!(
-    pub enum Instruction<'a> {
-        Block     : block      : "block"      { id: Option<Index<'a>> },
-        Br        : br         : "br"         { id: Index<'a> },
-        BrIf      : br_if      : "br_if"      { id: Index<'a> },
-        BrTable   : br_table   : "br_table"   { ids: Index<'a> },
-        Call      : call       : "call"       { id: Index<'a> },
+    pub enum Instruction {
+        Block     : block      : "block"      { id: Option<Index> },
+        Br        : br         : "br"         { id: Index },
+        BrIf      : br_if      : "br_if"      { id: Index },
+        BrTable   : br_table   : "br_table"   { ids: Index },
+        Call      : call       : "call"       { id: Index },
         Drop      : drop       : "drop"       {},
-        GlobalGet : global_get : "global.get" { id: Index<'a> },
-        GlobalSet : global_set : "global.set" { id: Index<'a> },
+        GlobalGet : global_get : "global.get" { id: Index },
+        GlobalSet : global_set : "global.set" { id: Index },
         I32Add    : i32_add    : "i32.add"    {},
-        I32Const  : i32_const  : "i32.const"  { integer: Integer<'a> },
+        I32Const  : i32_const  : "i32.const"  { integer: Integer },
         I32Eq     : i32_eq     : "i32.eq"     {},
         I32Eqz    : i32_eqz    : "i32.eqz"    {},
         I32GtU    : i32_gt_u   : "i32.gt_u"   {},
         I32Ne     : i32_ne     : "i32.ne"     {},
         I32Sub    : i32_sub    : "i32.sub"    {},
-        I64Const  : i64_const  : "i64.const"  { integer: Integer<'a> },
+        I64Const  : i64_const  : "i64.const"  { integer: Integer },
         If        : r#if       : "if"         {},
-        Local     : local      : "local"      { id: Index<'a>, value_type: ValueType },
-        LocalGet  : local_get  : "local.get"  { id: Index<'a> },
-        LocalSet  : local_set  : "local.set"  { id: Index<'a> },
-        LocalTee  : local_tee  : "local.tee"  { id: Index<'a> },
-        Loop      : r#loop     : "loop"       { id: Option<Index<'a>> },
+        Local     : local      : "local"      { id: Index, value_type: ValueType },
+        LocalGet  : local_get  : "local.get"  { id: Index },
+        LocalSet  : local_set  : "local.set"  { id: Index },
+        LocalTee  : local_tee  : "local.tee"  { id: Index },
+        Loop      : r#loop     : "loop"       { id: Option<Index> },
         Then      : then       : "then"       {},
     }
 );

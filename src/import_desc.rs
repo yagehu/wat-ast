@@ -3,12 +3,12 @@ use wast::parser::{Parse, Parser, Result};
 use crate::{Index, TypeUse};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ImportDesc<'a> {
-    Func(ImportDescFunc<'a>),
+pub enum ImportDesc {
+    Func(ImportDescFunc),
 }
 
-impl<'a> Parse<'a> for ImportDesc<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for ImportDesc {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut l = parser.lookahead1();
 
         if l.peek::<wast::kw::func>() {
@@ -21,13 +21,13 @@ impl<'a> Parse<'a> for ImportDesc<'a> {
 
 /// https://webassembly.github.io/spec/core/text/modules.html#text-importdesc
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ImportDescFunc<'a> {
-    pub id: Option<Index<'a>>,
-    pub type_use: TypeUse<'a>,
+pub struct ImportDescFunc {
+    pub id: Option<Index>,
+    pub type_use: TypeUse,
 }
 
-impl<'a> Parse<'a> for ImportDescFunc<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for ImportDescFunc {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::func>()?;
 
         let id = parser.parse::<Option<Index>>()?;

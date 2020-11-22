@@ -3,12 +3,12 @@ use wast::parser::{Parse, Parser, Result};
 use crate::Section;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Module<'a> {
-    pub sections: Vec<Section<'a>>,
+pub struct Module {
+    pub sections: Vec<Section>,
 }
 
-impl<'a> Parse<'a> for Module<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for Module {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::module>()?;
 
         let mut sections = Vec::new();

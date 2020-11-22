@@ -3,13 +3,13 @@ use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 use crate::{Integer, Sign};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Index<'a> {
-    Numeric(NumericIndex<'a>),
-    Symbolic(SymbolicIndex<'a>),
+pub enum Index {
+    Numeric(NumericIndex),
+    Symbolic(SymbolicIndex),
 }
 
-impl<'a> Parse<'a> for Index<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for Index {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         match parser.parse::<NumericIndex>() {
             Ok(ni) => Ok(Self::Numeric(ni)),
             Err(_) => match parser.parse::<SymbolicIndex>() {
@@ -20,7 +20,7 @@ impl<'a> Parse<'a> for Index<'a> {
     }
 }
 
-impl Peek for Index<'_> {
+impl Peek for Index {
     fn peek(cursor: Cursor<'_>) -> bool {
         cursor.id().is_some() || cursor.integer().is_some()
     }
@@ -31,12 +31,12 @@ impl Peek for Index<'_> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Indexes<'a> {
-    pub ids: Vec<Index<'a>>,
+pub struct Indexes {
+    pub ids: Vec<Index>,
 }
 
-impl<'a> Parse<'a> for Indexes<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for Indexes {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut ids = Vec::new();
 
         while parser.peek::<Index>() {
@@ -48,12 +48,12 @@ impl<'a> Parse<'a> for Indexes<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NumericIndex<'a> {
-    i: Integer<'a>,
+pub struct NumericIndex {
+    i: Integer,
     span: wast::Span,
 }
 
-impl<'a> NumericIndex<'a> {
+impl NumericIndex {
     pub fn span(&self) -> wast::Span {
         self.span
     }
@@ -64,7 +64,7 @@ impl<'a> NumericIndex<'a> {
     }
 
     /// Returns the original source text for this integer.
-    pub fn src(&self) -> &'a str {
+    pub fn src(&self) -> &str {
         self.i.src()
     }
 
@@ -75,8 +75,8 @@ impl<'a> NumericIndex<'a> {
     }
 }
 
-impl<'a> Parse<'a> for NumericIndex<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for NumericIndex {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let span = parser.cur_span();
         let int = parser.step(|cursor| match cursor.integer() {
             Some((i, cur)) => Ok((i, cur)),
@@ -88,13 +88,13 @@ impl<'a> Parse<'a> for NumericIndex<'a> {
         });
         let (val, radix) = int.val();
         let hex = if radix == 16 { true } else { false };
-        let i = Integer::new(sign, int.src(), val, hex);
+        let i = Integer::new(sign, int.src().to_owned(), val.to_owned(), hex);
 
         Ok(Self { i, span })
     }
 }
 
-impl Peek for NumericIndex<'_> {
+impl Peek for NumericIndex {
     fn peek(cursor: Cursor<'_>) -> bool {
         cursor.integer().is_some()
     }
@@ -105,23 +105,23 @@ impl Peek for NumericIndex<'_> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SymbolicIndex<'a> {
-    name: &'a str,
+pub struct SymbolicIndex {
+    name: String,
 
     /// Span only makes sense when SymbolicIndex was parsed from a token
     /// stream.
     span: Option<wast::Span>,
 }
 
-impl<'a> SymbolicIndex<'a> {
+impl SymbolicIndex {
     /// This method can be used when you are building an in-memory data
     /// structure. In that case, there's no need for a span.
-    pub fn new(name: &'a str) -> Self {
+    pub fn new(name: String) -> Self {
         Self { name, span: None }
     }
 
-    pub fn name(&self) -> &'a str {
-        self.name
+    pub fn name(&self) -> &str {
+        &self.name
     }
 
     pub fn span(&self) -> Option<wast::Span> {
@@ -129,17 +129,17 @@ impl<'a> SymbolicIndex<'a> {
     }
 }
 
-impl<'a> Parse<'a> for SymbolicIndex<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for SymbolicIndex {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let id = parser.parse::<wast::Id>()?;
-        let name = id.name();
+        let name = id.name().to_owned();
         let span = Some(id.span());
 
         Ok(Self { name, span })
     }
 }
 
-impl Peek for SymbolicIndex<'_> {
+impl Peek for SymbolicIndex {
     fn peek(cursor: Cursor<'_>) -> bool {
         cursor.id().is_some()
     }

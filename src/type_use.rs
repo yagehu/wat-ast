@@ -4,14 +4,14 @@ use crate::{Index, Param, Result};
 
 /// https://webassembly.github.io/spec/core/text/modules.html#text-typeuse
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TypeUse<'a> {
-    pub type_def: Option<Type<'a>>,
+pub struct TypeUse {
+    pub type_def: Option<Type>,
     pub params: Vec<Param>,
     pub results: Vec<Result>,
 }
 
-impl<'a> Parse<'a> for TypeUse<'a> {
-    fn parse(parser: Parser<'a>) -> parser::Result<Self> {
+impl Parse<'_> for TypeUse {
+    fn parse(parser: Parser<'_>) -> parser::Result<Self> {
         let mut type_def = None;
 
         if parser.peek2::<wast::kw::r#type>() {
@@ -46,12 +46,12 @@ impl<'a> Parse<'a> for TypeUse<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Type<'a> {
-    pub idx: Index<'a>,
+pub struct Type {
+    pub idx: Index,
 }
 
-impl<'a> Parse<'a> for Type<'a> {
-    fn parse(parser: Parser<'a>) -> parser::Result<Self> {
+impl Parse<'_> for Type {
+    fn parse(parser: Parser<'_>) -> parser::Result<Self> {
         parser.parse::<wast::kw::r#type>()?;
 
         let idx = parser.parse::<Index>()?;

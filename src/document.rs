@@ -3,12 +3,12 @@ use wast::parser::{Parse, Parser, Result};
 use crate::Module;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Document<'a> {
-    pub module: Module<'a>,
+pub struct Document {
+    pub module: Module,
 }
 
-impl<'a> Parse<'a> for Document<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for Document {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let module = parser.parens(|p| p.parse::<Module>())?;
 
         Ok(Self { module })

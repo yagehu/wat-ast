@@ -7,17 +7,17 @@ use crate::{
 
 /// https://webassembly.github.io/spec/core/text/modules.html#text-module
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Section<'a> {
-    Type(TypeSection<'a>),
-    Import(ImportSection<'a>),
-    Function(FunctionSection<'a>),
-    Memory(MemorySection<'a>),
-    Global(GlobalSection<'a>),
-    Data(DataSection<'a>),
+pub enum Section {
+    Type(TypeSection),
+    Import(ImportSection),
+    Function(FunctionSection),
+    Memory(MemorySection),
+    Global(GlobalSection),
+    Data(DataSection),
 }
 
-impl<'a> Parse<'a> for Section<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for Section {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         while !parser.is_empty() {
             if parser.peek2::<wast::kw::r#type>() {
                 return Ok(Self::Type(parser.parse()?));
@@ -41,12 +41,12 @@ impl<'a> Parse<'a> for Section<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TypeSection<'a> {
-    pub entries: Vec<TypeSectionEntry<'a>>,
+pub struct TypeSection {
+    pub entries: Vec<TypeSectionEntry>,
 }
 
-impl<'a> Parse<'a> for TypeSection<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for TypeSection {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut entries = Vec::new();
 
         while !parser.is_empty() {
@@ -62,13 +62,13 @@ impl<'a> Parse<'a> for TypeSection<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TypeSectionEntry<'a> {
-    pub idx: Option<Index<'a>>,
+pub struct TypeSectionEntry {
+    pub idx: Option<Index>,
     pub func_type: FuncType,
 }
 
-impl<'a> Parse<'a> for TypeSectionEntry<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for TypeSectionEntry {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::r#type>()?;
 
         let idx = parser.parse::<Option<Index>>()?;
@@ -79,12 +79,12 @@ impl<'a> Parse<'a> for TypeSectionEntry<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ImportSection<'a> {
-    pub entries: Vec<ImportSectionEntry<'a>>,
+pub struct ImportSection {
+    pub entries: Vec<ImportSectionEntry>,
 }
 
-impl<'a> Parse<'a> for ImportSection<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for ImportSection {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut entries = Vec::new();
 
         while !parser.is_empty() {
@@ -100,18 +100,18 @@ impl<'a> Parse<'a> for ImportSection<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ImportSectionEntry<'a> {
-    pub module: &'a str,
-    pub name: &'a str,
-    pub desc: ImportDesc<'a>,
+pub struct ImportSectionEntry {
+    pub module: String,
+    pub name: String,
+    pub desc: ImportDesc,
 }
 
-impl<'a> Parse<'a> for ImportSectionEntry<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for ImportSectionEntry {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::import>()?;
 
-        let module = parser.parse::<&str>()?;
-        let name = parser.parse::<&str>()?;
+        let module = parser.parse::<String>()?;
+        let name = parser.parse::<String>()?;
         let desc = parser.parens(ImportDesc::parse)?;
 
         Ok(Self { module, name, desc })
@@ -119,12 +119,12 @@ impl<'a> Parse<'a> for ImportSectionEntry<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FunctionSection<'a> {
-    pub entries: Vec<FunctionSectionEntry<'a>>,
+pub struct FunctionSection {
+    pub entries: Vec<FunctionSectionEntry>,
 }
 
-impl<'a> Parse<'a> for FunctionSection<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for FunctionSection {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut entries = Vec::new();
 
         while !parser.is_empty() {
@@ -140,15 +140,15 @@ impl<'a> Parse<'a> for FunctionSection<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FunctionSectionEntry<'a> {
-    pub idx: Index<'a>,
-    pub export: Option<Export<'a>>,
-    pub type_use: TypeUse<'a>,
-    pub exprs: Vec<Expression<'a>>,
+pub struct FunctionSectionEntry {
+    pub idx: Index,
+    pub export: Option<Export>,
+    pub type_use: TypeUse,
+    pub exprs: Vec<Expression>,
 }
 
-impl<'a> Parse<'a> for FunctionSectionEntry<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for FunctionSectionEntry {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::func>()?;
 
         let idx = parser.parse::<Index>()?;
@@ -172,12 +172,12 @@ impl<'a> Parse<'a> for FunctionSectionEntry<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MemorySection<'a> {
-    pub entries: Vec<MemorySectionEntry<'a>>,
+pub struct MemorySection {
+    pub entries: Vec<MemorySectionEntry>,
 }
 
-impl<'a> Parse<'a> for MemorySection<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for MemorySection {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut entries = Vec::new();
 
         while !parser.is_empty() {
@@ -193,14 +193,14 @@ impl<'a> Parse<'a> for MemorySection<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MemorySectionEntry<'a> {
-    pub idx: Option<Index<'a>>,
-    pub export: Option<Export<'a>>,
-    pub mem_type: MemType<'a>,
+pub struct MemorySectionEntry {
+    pub idx: Option<Index>,
+    pub export: Option<Export>,
+    pub mem_type: MemType,
 }
 
-impl<'a> Parse<'a> for MemorySectionEntry<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for MemorySectionEntry {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::memory>()?;
 
         let idx = parser.parse::<Option<Index>>()?;
@@ -221,12 +221,12 @@ impl<'a> Parse<'a> for MemorySectionEntry<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GlobalSection<'a> {
-    pub entries: Vec<GlobalSectionEntry<'a>>,
+pub struct GlobalSection {
+    pub entries: Vec<GlobalSectionEntry>,
 }
 
-impl<'a> Parse<'a> for GlobalSection<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for GlobalSection {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut entries = Vec::new();
 
         while !parser.is_empty() {
@@ -242,15 +242,15 @@ impl<'a> Parse<'a> for GlobalSection<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GlobalSectionEntry<'a> {
-    pub idx: Option<Index<'a>>,
-    pub export: Option<Export<'a>>,
+pub struct GlobalSectionEntry {
+    pub idx: Option<Index>,
+    pub export: Option<Export>,
     pub global_type: GlobalType,
-    pub expr: Expression<'a>,
+    pub expr: Expression,
 }
 
-impl<'a> Parse<'a> for GlobalSectionEntry<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for GlobalSectionEntry {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::global>()?;
 
         let idx = parser.parse::<Option<Index>>()?;
@@ -279,12 +279,12 @@ impl<'a> Parse<'a> for GlobalSectionEntry<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DataSection<'a> {
-    pub entries: Vec<DataSectionEntry<'a>>,
+pub struct DataSection {
+    pub entries: Vec<DataSectionEntry>,
 }
 
-impl<'a> Parse<'a> for DataSection<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for DataSection {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut entries = Vec::new();
 
         while !parser.is_empty() {
@@ -300,13 +300,13 @@ impl<'a> Parse<'a> for DataSection<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Offset<'a> {
-    Folded(Expression<'a>),
-    Unfolded(Expression<'a>),
+pub enum Offset {
+    Folded(Expression),
+    Unfolded(Expression),
 }
 
-impl<'a> Parse<'a> for Offset<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for Offset {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut exprs;
         let is_folded;
 
@@ -339,16 +339,16 @@ impl<'a> Parse<'a> for Offset<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DataString<'a> {
-    pub strs: Vec<&'a str>,
+pub struct DataString {
+    pub strs: Vec<String>,
 }
 
-impl<'a> Parse<'a> for DataString<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for DataString {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut strs = Vec::new();
 
         while !parser.is_empty() {
-            strs.push(parser.parse::<&str>()?);
+            strs.push(parser.parse::<String>()?);
         }
 
         Ok(Self { strs })
@@ -356,14 +356,14 @@ impl<'a> Parse<'a> for DataString<'a> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DataSectionEntry<'a> {
-    pub idx: Option<Index<'a>>,
-    pub offset: Offset<'a>,
-    pub data_string: DataString<'a>,
+pub struct DataSectionEntry {
+    pub idx: Option<Index>,
+    pub offset: Offset,
+    pub data_string: DataString,
 }
 
-impl<'a> Parse<'a> for DataSectionEntry<'a> {
-    fn parse(parser: Parser<'a>) -> Result<Self> {
+impl Parse<'_> for DataSectionEntry {
+    fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::data>()?;
 
         let idx = parser.parse::<Option<Index>>()?;
