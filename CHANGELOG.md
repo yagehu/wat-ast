@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2020-11-21
+### Added
+- Constructor for SymbolicIndex.
+### Changed
+- Span in SymbolicIndex is now optional.
+
 ## [0.5.2] - 2020-11-21
 ### Added
 - Export various section types.
@@ -38,7 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `instructions` macro export.
 
 [Unreleased]: https://github.com/yagehu/wat-ast/compare/v0.2.1...HEAD
-[0.5.1]: https://github.com/yagehu/wat-ast/compare/v0.5.1...v0.5.2
+[0.6.0]: https://github.com/yagehu/wat-ast/compare/v0.5.2...v0.6.0
+[0.5.2]: https://github.com/yagehu/wat-ast/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/yagehu/wat-ast/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/yagehu/wat-ast/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/yagehu/wat-ast/compare/v0.3.0...v0.4.0

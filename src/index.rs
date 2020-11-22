@@ -105,23 +105,37 @@ impl Peek for NumericIndex<'_> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SymbolicIndex<'a>(wast::Id<'a>);
+pub struct SymbolicIndex<'a> {
+    name: &'a str,
+
+    /// Span only makes sense when SymbolicIndex was parsed from a token
+    /// stream.
+    span: Option<wast::Span>,
+}
 
 impl<'a> SymbolicIndex<'a> {
-    pub fn name(&self) -> &'a str {
-        self.0.name()
+    /// This method can be used when you are building an in-memory data
+    /// structure. In that case, there's no need for a span.
+    pub fn new(name: &'a str) -> Self {
+        Self { name, span: None }
     }
 
-    pub fn span(&self) -> wast::Span {
-        self.0.span()
+    pub fn name(&self) -> &'a str {
+        self.name
+    }
+
+    pub fn span(&self) -> Option<wast::Span> {
+        self.span
     }
 }
 
 impl<'a> Parse<'a> for SymbolicIndex<'a> {
     fn parse(parser: Parser<'a>) -> Result<Self> {
         let id = parser.parse::<wast::Id>()?;
+        let name = id.name();
+        let span = Some(id.span());
 
-        Ok(Self(id))
+        Ok(Self { name, span })
     }
 }
 
