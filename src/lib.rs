@@ -7,7 +7,11 @@ pub use integer::{Integer, Sign};
 pub use module::Module;
 pub use param::Param;
 pub use result::Result;
-pub use section::{FunctionSectionEntry, Section};
+pub use section::{
+    DataSection, DataSectionEntry, FunctionSection, FunctionSectionEntry,
+    GlobalSection, GlobalSectionEntry, ImportSection, ImportSectionEntry,
+    MemorySection, MemorySectionEntry, Section, TypeSection, TypeSectionEntry,
+};
 pub use type_use::TypeUse;
 pub use types::{FuncType, GlobalType, MemType, ValueType};
 
