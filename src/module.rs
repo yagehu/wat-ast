@@ -1,6 +1,6 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::Section;
+use crate::{Expr, SExpr, Section};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Module {
@@ -18,5 +18,15 @@ impl Parse<'_> for Module {
         }
 
         Ok(Self { sections })
+    }
+}
+
+impl SExpr for Module {
+    fn car(&self) -> String {
+        "module".to_owned()
+    }
+
+    fn cdr(&self) -> Vec<Expr> {
+        self.sections.iter().flat_map(|s| s.exprs()).collect()
     }
 }

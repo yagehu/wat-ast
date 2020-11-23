@@ -1,10 +1,25 @@
+use std::fmt;
+
 use wast::parser::{Parse, Parser, Result};
 
-use crate::Module;
+use crate::{Expr, Module, ToWat, ToWatParams};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Document {
     pub module: Module,
+}
+
+impl fmt::Display for Document {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            Expr::SExpr(Box::new(self.module.clone())).to_wat(&ToWatParams {
+                indent_size: 2,
+                indent_level: 0,
+            })
+        )
+    }
 }
 
 impl Parse<'_> for Document {
@@ -30,5 +45,18 @@ mod tests {
                 module: Module { sections: vec![] },
             },
         )
+    }
+
+    #[test]
+    fn output_empty_module() {
+        assert_eq!(
+            Document {
+                module: Module {
+                    sections: Vec::new(),
+                },
+            }
+            .to_string(),
+            "(module)",
+        );
     }
 }

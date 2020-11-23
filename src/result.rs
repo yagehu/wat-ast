@@ -1,10 +1,23 @@
 use wast::parser::{self, Parse, Parser};
 
-use crate::ValueType;
+use crate::{Expr, SExpr, ValueType};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Result {
     pub value_types: Vec<ValueType>,
+}
+
+impl SExpr for Result {
+    fn car(&self) -> String {
+        "result".to_owned()
+    }
+
+    fn cdr(&self) -> Vec<Expr> {
+        self.value_types
+            .iter()
+            .map(|v| Expr::Atom(v.to_string()))
+            .collect()
+    }
 }
 
 impl Parse<'_> for Result {

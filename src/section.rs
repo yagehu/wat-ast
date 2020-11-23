@@ -1,8 +1,8 @@
 use wast::parser::{Parse, Parser, Result};
 
 use crate::{
-    Export, Expression, ExpressionParser, FuncType, GlobalType, ImportDesc,
-    Index, MemType, TypeUse,
+    Expr, Expression, ExpressionParser, FuncType, GlobalType, ImportDesc,
+    Index, InlineExport, MemType, SExpr, TypeUse,
 };
 
 /// https://webassembly.github.io/spec/core/text/modules.html#text-module
@@ -14,6 +14,19 @@ pub enum Section {
     Memory(MemorySection),
     Global(GlobalSection),
     Data(DataSection),
+}
+
+impl Section {
+    pub(crate) fn exprs(&self) -> Vec<Expr> {
+        match self {
+            Self::Type(s) => s.exprs(),
+            Self::Import(s) => s.exprs(),
+            Self::Function(s) => s.exprs(),
+            Self::Memory(s) => s.exprs(),
+            Self::Global(s) => s.exprs(),
+            Self::Data(s) => s.exprs(),
+        }
+    }
 }
 
 impl Parse<'_> for Section {
@@ -45,6 +58,15 @@ pub struct TypeSection {
     pub entries: Vec<TypeSectionEntry>,
 }
 
+impl TypeSection {
+    pub(crate) fn exprs(&self) -> Vec<Expr> {
+        self.entries
+            .iter()
+            .map(|e| Expr::SExpr(Box::new(e.clone())))
+            .collect()
+    }
+}
+
 impl Parse<'_> for TypeSection {
     fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut entries = Vec::new();
@@ -67,6 +89,24 @@ pub struct TypeSectionEntry {
     pub func_type: FuncType,
 }
 
+impl SExpr for TypeSectionEntry {
+    fn car(&self) -> String {
+        "type".to_owned()
+    }
+
+    fn cdr(&self) -> Vec<Expr> {
+        let mut v = Vec::new();
+
+        if let Some(ref idx) = self.idx {
+            v.push(Expr::Atom(idx.to_string()));
+        }
+
+        v.push(Expr::SExpr(Box::new(self.func_type.clone())));
+
+        v
+    }
+}
+
 impl Parse<'_> for TypeSectionEntry {
     fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::r#type>()?;
@@ -81,6 +121,15 @@ impl Parse<'_> for TypeSectionEntry {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImportSection {
     pub entries: Vec<ImportSectionEntry>,
+}
+
+impl ImportSection {
+    pub(crate) fn exprs(&self) -> Vec<Expr> {
+        self.entries
+            .iter()
+            .map(|e| Expr::SExpr(Box::new(e.clone())))
+            .collect()
+    }
 }
 
 impl Parse<'_> for ImportSection {
@@ -106,6 +155,20 @@ pub struct ImportSectionEntry {
     pub desc: ImportDesc,
 }
 
+impl SExpr for ImportSectionEntry {
+    fn car(&self) -> String {
+        "import".to_owned()
+    }
+
+    fn cdr(&self) -> Vec<Expr> {
+        vec![
+            Expr::Atom(self.module.to_string()),
+            Expr::Atom(self.name.to_string()),
+            Expr::SExpr(Box::new(self.desc.clone())),
+        ]
+    }
+}
+
 impl Parse<'_> for ImportSectionEntry {
     fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::import>()?;
@@ -121,6 +184,15 @@ impl Parse<'_> for ImportSectionEntry {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FunctionSection {
     pub entries: Vec<FunctionSectionEntry>,
+}
+
+impl FunctionSection {
+    pub(crate) fn exprs(&self) -> Vec<Expr> {
+        self.entries
+            .iter()
+            .map(|e| Expr::SExpr(Box::new(e.clone())))
+            .collect()
+    }
 }
 
 impl Parse<'_> for FunctionSection {
@@ -141,21 +213,44 @@ impl Parse<'_> for FunctionSection {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FunctionSectionEntry {
-    pub idx: Index,
-    pub export: Option<Export>,
+    pub idx: Option<Index>,
+    pub inline_export: Option<InlineExport>,
     pub type_use: TypeUse,
     pub exprs: Vec<Expression>,
+}
+
+impl SExpr for FunctionSectionEntry {
+    fn car(&self) -> String {
+        "func".to_owned()
+    }
+
+    fn cdr(&self) -> Vec<Expr> {
+        let mut v = Vec::new();
+
+        if let Some(ref idx) = self.idx {
+            v.push(Expr::Atom(idx.to_string()));
+        }
+
+        if let Some(ref inline_export) = self.inline_export {
+            v.push(Expr::SExpr(Box::new(inline_export.clone())));
+        }
+
+        v.append(&mut self.type_use.exprs());
+        v.append(&mut self.exprs.iter().map(|e| e.expr()).collect());
+
+        v
+    }
 }
 
 impl Parse<'_> for FunctionSectionEntry {
     fn parse(parser: Parser<'_>) -> Result<Self> {
         parser.parse::<wast::kw::func>()?;
 
-        let idx = parser.parse::<Index>()?;
-        let mut export = None;
+        let idx = parser.parse::<Option<Index>>()?;
+        let mut inline_export = None;
 
         if parser.peek2::<wast::kw::export>() {
-            export = Some(parser.parens(Export::parse)?);
+            inline_export = Some(parser.parens(InlineExport::parse)?);
         }
 
         let type_use = parser.parse::<TypeUse>()?;
@@ -164,7 +259,7 @@ impl Parse<'_> for FunctionSectionEntry {
 
         Ok(Self {
             idx,
-            export,
+            inline_export,
             type_use,
             exprs,
         })
@@ -174,6 +269,15 @@ impl Parse<'_> for FunctionSectionEntry {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MemorySection {
     pub entries: Vec<MemorySectionEntry>,
+}
+
+impl MemorySection {
+    pub(crate) fn exprs(&self) -> Vec<Expr> {
+        self.entries
+            .iter()
+            .map(|e| Expr::SExpr(Box::new(e.clone())))
+            .collect()
+    }
 }
 
 impl Parse<'_> for MemorySection {
@@ -195,8 +299,30 @@ impl Parse<'_> for MemorySection {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MemorySectionEntry {
     pub idx: Option<Index>,
-    pub export: Option<Export>,
+    pub inline_export: Option<InlineExport>,
     pub mem_type: MemType,
+}
+
+impl SExpr for MemorySectionEntry {
+    fn car(&self) -> String {
+        "memory".to_owned()
+    }
+
+    fn cdr(&self) -> Vec<Expr> {
+        let mut v = Vec::new();
+
+        if let Some(ref idx) = self.idx {
+            v.push(Expr::Atom(idx.to_string()));
+        }
+
+        if let Some(ref inline_export) = self.inline_export {
+            v.push(Expr::SExpr(Box::new(inline_export.clone())));
+        }
+
+        v.append(&mut self.mem_type.exprs());
+
+        v
+    }
 }
 
 impl Parse<'_> for MemorySectionEntry {
@@ -204,17 +330,17 @@ impl Parse<'_> for MemorySectionEntry {
         parser.parse::<wast::kw::memory>()?;
 
         let idx = parser.parse::<Option<Index>>()?;
-        let mut export = None;
+        let mut inline_export = None;
 
         if parser.peek2::<wast::kw::export>() {
-            export = Some(parser.parens(Export::parse)?);
+            inline_export = Some(parser.parens(InlineExport::parse)?);
         }
 
         let mem_type = parser.parse::<MemType>()?;
 
         Ok(Self {
             idx,
-            export,
+            inline_export,
             mem_type,
         })
     }
@@ -223,6 +349,15 @@ impl Parse<'_> for MemorySectionEntry {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GlobalSection {
     pub entries: Vec<GlobalSectionEntry>,
+}
+
+impl GlobalSection {
+    pub(crate) fn exprs(&self) -> Vec<Expr> {
+        self.entries
+            .iter()
+            .map(|e| Expr::SExpr(Box::new(e.clone())))
+            .collect()
+    }
 }
 
 impl Parse<'_> for GlobalSection {
@@ -244,9 +379,37 @@ impl Parse<'_> for GlobalSection {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GlobalSectionEntry {
     pub idx: Option<Index>,
-    pub export: Option<Export>,
+    pub inline_export: Option<InlineExport>,
     pub global_type: GlobalType,
-    pub expr: Expression,
+
+    /// An imported global does not have expr.
+    pub expr: Option<Expression>,
+}
+
+impl SExpr for GlobalSectionEntry {
+    fn car(&self) -> String {
+        "global".to_owned()
+    }
+
+    fn cdr(&self) -> Vec<Expr> {
+        let mut v = Vec::new();
+
+        if let Some(ref idx) = self.idx {
+            v.push(Expr::Atom(idx.to_string()));
+        }
+
+        if let Some(ref inline_export) = self.inline_export {
+            v.push(Expr::SExpr(Box::new(inline_export.clone())));
+        }
+
+        v.push(self.global_type.expr());
+
+        if let Some(ref expr) = self.expr {
+            v.push(expr.expr());
+        }
+
+        v
+    }
 }
 
 impl Parse<'_> for GlobalSectionEntry {
@@ -254,24 +417,29 @@ impl Parse<'_> for GlobalSectionEntry {
         parser.parse::<wast::kw::global>()?;
 
         let idx = parser.parse::<Option<Index>>()?;
-        let mut export = None;
+        let mut inline_export = None;
 
         if parser.peek2::<wast::kw::export>() {
-            export = Some(parser.parens(Export::parse)?);
+            inline_export = Some(parser.parens(InlineExport::parse)?);
         }
 
         let global_type = parser.parse::<GlobalType>()?;
         let mut exprs = ExpressionParser::default().parse(parser)?;
+        let expr;
 
-        if exprs.len() != 1 {
-            return Err(parser.error("only one expr is expected"));
+        if exprs.len() == 0 {
+            expr = None;
+        } else {
+            if exprs.len() != 1 {
+                return Err(parser.error("only one expr is expected"));
+            }
+
+            expr = Some(exprs.pop().unwrap());
         }
-
-        let expr = exprs.pop().unwrap();
 
         Ok(Self {
             idx,
-            export,
+            inline_export,
             global_type,
             expr,
         })
@@ -281,6 +449,15 @@ impl Parse<'_> for GlobalSectionEntry {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DataSection {
     pub entries: Vec<DataSectionEntry>,
+}
+
+impl DataSection {
+    pub(crate) fn exprs(&self) -> Vec<Expr> {
+        self.entries
+            .iter()
+            .map(|e| Expr::SExpr(Box::new(e.clone())))
+            .collect()
+    }
 }
 
 impl Parse<'_> for DataSection {
@@ -303,6 +480,15 @@ impl Parse<'_> for DataSection {
 pub enum Offset {
     Folded(Expression),
     Unfolded(Expression),
+}
+
+impl Offset {
+    pub(crate) fn expr(&self) -> Expr {
+        match self {
+            Self::Folded(e) => e.expr(),
+            Self::Unfolded(e) => e.expr(),
+        }
+    }
 }
 
 impl Parse<'_> for Offset {
@@ -343,6 +529,12 @@ pub struct DataString {
     pub strs: Vec<String>,
 }
 
+impl DataString {
+    pub(crate) fn exprs(&self) -> Vec<Expr> {
+        self.strs.iter().map(|s| Expr::Atom(s.clone())).collect()
+    }
+}
+
 impl Parse<'_> for DataString {
     fn parse(parser: Parser<'_>) -> Result<Self> {
         let mut strs = Vec::new();
@@ -360,6 +552,25 @@ pub struct DataSectionEntry {
     pub idx: Option<Index>,
     pub offset: Offset,
     pub data_string: DataString,
+}
+
+impl SExpr for DataSectionEntry {
+    fn car(&self) -> String {
+        "data".to_owned()
+    }
+
+    fn cdr(&self) -> Vec<Expr> {
+        let mut v = Vec::new();
+
+        if let Some(idx) = self.idx.clone() {
+            v.push(Expr::Atom(idx.to_string()));
+        }
+
+        v.push(self.offset.expr());
+        v.append(&mut self.data_string.exprs());
+
+        v
+    }
 }
 
 impl Parse<'_> for DataSectionEntry {

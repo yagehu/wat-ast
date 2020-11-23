@@ -1,11 +1,28 @@
+use std::fmt;
+
 use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 
-use crate::{Integer, Sign};
+use crate::{Integer, Sign, ToUnfolded};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Index {
     Numeric(NumericIndex),
     Symbolic(SymbolicIndex),
+}
+
+impl fmt::Display for Index {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Numeric(i) => write!(f, "{}", i.src()),
+            Self::Symbolic(i) => write!(f, "{}", i.to_string()),
+        }
+    }
+}
+
+impl ToUnfolded for Index {
+    fn to_unfolded(&self) -> String {
+        self.to_string()
+    }
 }
 
 impl Parse<'_> for Index {
@@ -126,6 +143,12 @@ impl SymbolicIndex {
 
     pub fn span(&self) -> Option<wast::Span> {
         self.span
+    }
+}
+
+impl fmt::Display for SymbolicIndex {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "${}", self.name)
     }
 }
 

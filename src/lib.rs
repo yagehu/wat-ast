@@ -1,6 +1,6 @@
 pub use document::Document;
-pub use export::Export;
-pub use expr::{Expression, ExpressionParser, Instruction};
+pub use export::{Export, InlineExport};
+pub use expression::{Expression, ExpressionParser, Instruction};
 pub use import_desc::{ImportDesc, ImportDescFunc};
 pub use index::{Index, Indexes, SymbolicIndex};
 pub use integer::{Integer, Sign};
@@ -17,7 +17,7 @@ pub use types::{FuncType, GlobalType, MemType, ValueType};
 
 mod document;
 mod export;
-mod expr;
+mod expression;
 mod import_desc;
 mod index;
 mod integer;
@@ -27,3 +27,96 @@ mod result;
 mod section;
 mod type_use;
 mod types;
+
+use std::io;
+
+use expression::ToUnfolded;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct ToWatParams {
+    indent_size: usize,
+    indent_level: usize,
+}
+
+impl ToWatParams {
+    fn indent(&self) -> usize {
+        self.indent_size * self.indent_level
+    }
+}
+
+trait ToWat {
+    fn write_wat<W: io::Write>(
+        &self,
+        w: &mut W,
+        p: &ToWatParams,
+    ) -> io::Result<()>;
+
+    fn to_wat(&self, p: &ToWatParams) -> String {
+        let mut buf = Vec::new();
+
+        self.write_wat(&mut buf, p).unwrap();
+
+        String::from_utf8_lossy(&buf).to_string()
+    }
+}
+
+enum Expr {
+    Atom(String),
+    SExpr(Box<dyn SExpr>),
+}
+
+impl ToWat for Expr {
+    fn write_wat<W: io::Write>(
+        &self,
+        w: &mut W,
+        p: &ToWatParams,
+    ) -> io::Result<()> {
+        match self {
+            Self::Atom(s) => write!(w, "{}{}", " ".repeat(p.indent()), s),
+            Self::SExpr(se) => {
+                let open = format!("{}({}", " ".repeat(p.indent()), se.car());
+
+                if se.cdr().len() == 0 {
+                    return write!(w, "{})", &open);
+                }
+
+                let cdr = se
+                    .cdr()
+                    .iter()
+                    .map(|expr| {
+                        expr.to_wat(&ToWatParams {
+                            indent_size: 2,
+                            indent_level: 0,
+                        })
+                    })
+                    .collect::<Vec<String>>()
+                    .join(" ");
+
+                if format!("{} {})", open, cdr).len() <= 80 {
+                    return write!(w, "{} {})", open, cdr);
+                }
+
+                writeln!(w, "{}", open)?;
+
+                for expr in se.cdr() {
+                    expr.write_wat(
+                        w,
+                        &ToWatParams {
+                            indent_size: p.indent_size,
+                            indent_level: p.indent_level + 1,
+                        },
+                    )?;
+                    write!(w, "\n")?;
+                }
+
+                write!(w, "{})", " ".repeat(p.indent()))
+            }
+        }
+    }
+}
+
+trait SExpr {
+    fn car(&self) -> String;
+
+    fn cdr(&self) -> Vec<Expr>;
+}

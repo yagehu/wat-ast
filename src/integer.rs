@@ -1,4 +1,8 @@
+use std::fmt;
+
 use wast::parser::{Cursor, Parse, Parser, Peek, Result};
+
+use crate::ToUnfolded;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Integer {
@@ -37,6 +41,18 @@ impl Integer {
     /// the base that it should be parsed in
     pub fn val(&self) -> (&str, u32) {
         (&self.val, if self.hex { 16 } else { 10 })
+    }
+}
+
+impl fmt::Display for Integer {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.src)
+    }
+}
+
+impl ToUnfolded for Integer {
+    fn to_unfolded(&self) -> String {
+        self.to_string()
     }
 }
 

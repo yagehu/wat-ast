@@ -1,6 +1,6 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{Index, Integer, ValueType};
+use crate::{Expr, Index, Integer, SExpr, ValueType};
 
 enum Paren {
     None,
@@ -21,6 +21,13 @@ pub enum Expression {
 }
 
 impl Expression {
+    pub(crate) fn expr(&self) -> Expr {
+        match self {
+            Self::Unfolded(i) => Expr::Atom(i.to_unfolded()),
+            Self::Folded(i) => Expr::SExpr(Box::new(i.clone())),
+        }
+    }
+
     fn subexprs(&mut self) -> &mut Vec<Expression> {
         match self {
             Self::Unfolded(i) => i.subexprs(),
@@ -121,6 +128,16 @@ macro_rules! instructions {
             }
         }
 
+        impl ToUnfolded for Instruction {
+            fn to_unfolded(&self) -> String {
+                match self {
+                    $(
+                        Self::$name(i) => i.to_unfolded(),
+                    )*
+                }
+            }
+        }
+
         impl Parse<'_> for Instruction {
             fn parse(parser: Parser<'_>) -> Result<Self> {
                 let mut l = parser.lookahead1();
@@ -135,6 +152,24 @@ macro_rules! instructions {
             }
         }
 
+        impl SExpr for Instruction {
+            fn car(&self) -> String {
+                match self {
+                    $(
+                        Self::$name(i) => i.car(),
+                    )*
+                }
+            }
+
+            fn cdr(&self) -> Vec<Expr> {
+                match self {
+                    $(
+                        Self::$name(i) => i.cdr(),
+                    )*
+                }
+            }
+        }
+
         $(
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub struct $name {
@@ -142,6 +177,48 @@ macro_rules! instructions {
                     pub $field_name: $field_type,
                 )*
                 pub exprs: Vec<Expression>,
+            }
+
+            impl ToUnfolded for $name {
+                fn to_unfolded(&self) -> String {
+                    #[allow(unused_mut)]
+                    let mut s = format!("{}", $instr);
+
+                    $(
+                        let argstring = self.$field_name.to_unfolded();
+
+                        if argstring.len() != 0 {
+                            s.push(' ');
+                            s.push_str(&argstring);
+                        }
+                    )*
+
+                    s
+                }
+            }
+
+            impl SExpr for $name {
+                fn car(&self) -> String {
+                    format!("{}", $instr)
+                }
+
+                fn cdr(&self) -> Vec<Expr> {
+                    let mut v = vec![
+                        $(
+                            Expr::Atom(self.$field_name.to_unfolded()),
+                        )*
+                    ];
+
+                    v.append(
+                        &mut self
+                            .exprs
+                            .iter()
+                            .map(|e| e.expr())
+                            .collect()
+                    );
+
+                    v
+                }
             }
 
             impl Parse<'_> for $name {
@@ -191,3 +268,13 @@ instructions!(
         Then      : then       : "then"       {},
     }
 );
+
+pub trait ToUnfolded {
+    fn to_unfolded(&self) -> String;
+}
+
+impl<T: ToString> ToUnfolded for Option<T> {
+    fn to_unfolded(&self) -> String {
+        self.as_ref().map_or("".to_owned(), |t| t.to_string())
+    }
+}
