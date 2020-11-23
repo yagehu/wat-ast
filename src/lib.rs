@@ -60,7 +60,7 @@ trait ToWat {
     }
 }
 
-enum Expr {
+pub enum Expr {
     Atom(String),
     SExpr(Box<dyn SExpr>),
 }
@@ -115,7 +115,7 @@ impl ToWat for Expr {
     }
 }
 
-trait SExpr {
+pub trait SExpr {
     fn car(&self) -> String;
 
     fn cdr(&self) -> Vec<Expr>;
