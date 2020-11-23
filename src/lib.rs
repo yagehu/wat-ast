@@ -1,6 +1,6 @@
 pub use document::Document;
 pub use export::{Export, InlineExport};
-pub use expression::{Expression, ExpressionParser, Instruction};
+pub use expression::{Expression, ExpressionParser, Instruction, ToUnfolded};
 pub use import_desc::{ImportDesc, ImportDescFunc};
 pub use index::{Index, Indexes, SymbolicIndex};
 pub use integer::{Integer, Sign};
@@ -29,8 +29,6 @@ mod type_use;
 mod types;
 
 use std::io;
-
-use expression::ToUnfolded;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct ToWatParams {

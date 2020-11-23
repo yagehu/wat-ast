@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2] - 2020-11-23
+### Added
+- `ToUnfolded` trait is now public.
+
 ## [0.8.1] - 2020-11-23
 ### Added
-- Expr and SExpr are not public.
+- `Expr` and `SExpr` are now public.
 
 ## [0.8.0] - 2020-11-23
 ### Added
