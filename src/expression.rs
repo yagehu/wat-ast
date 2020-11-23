@@ -285,6 +285,12 @@ pub trait ToAtoms {
     fn to_atoms(&self) -> Vec<Atom>;
 }
 
+impl ToAtoms for String {
+    fn to_atoms(&self) -> Vec<Atom> {
+        vec![Atom::new(format!(r#""{}""#, self))]
+    }
+}
+
 impl<T: ToAtoms + Clone> ToAtoms for Option<T> {
     fn to_atoms(&self) -> Vec<Atom> {
         self.clone().map_or(Vec::new(), |x| x.to_atoms())
