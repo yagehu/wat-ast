@@ -153,7 +153,7 @@ macro_rules! instructions {
         }
 
         impl SExpr for Instruction {
-            fn car(&self) -> String {
+            fn car(&self) -> std::string::String {
                 match self {
                     $(
                         Self::$name(i) => i.car(),
@@ -182,7 +182,7 @@ macro_rules! instructions {
             impl $name {
                 pub fn as_atom(&self) -> Atom {
                     #[allow(unused_mut)]
-                    let mut s = String::new();
+                    let mut s = std::string::String::new();
 
                     $(
                         s.push(' ');
@@ -192,7 +192,7 @@ macro_rules! instructions {
                                 .to_atoms()
                                 .iter()
                                 .map(ToString::to_string)
-                                .collect::<Vec<String>>()
+                                .collect::<Vec<std::string::String>>()
                                 .join(" ")
                         );
                     )*
@@ -202,7 +202,7 @@ macro_rules! instructions {
             }
 
             impl SExpr for $name {
-                fn car(&self) -> String {
+                fn car(&self) -> std::string::String {
                     format!("{}", $instr)
                 }
 
