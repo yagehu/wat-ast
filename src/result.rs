@@ -1,6 +1,6 @@
 use wast::parser::{self, Parse, Parser};
 
-use crate::{Expr, SExpr, ValueType};
+use crate::{Atom, Expr, SExpr, ValueType};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Result {
@@ -15,7 +15,7 @@ impl SExpr for Result {
     fn cdr(&self) -> Vec<Expr> {
         self.value_types
             .iter()
-            .map(|v| Expr::Atom(v.to_string()))
+            .map(|v| Expr::Atom(Atom::new(v.to_string())))
             .collect()
     }
 }

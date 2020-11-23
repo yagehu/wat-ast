@@ -2,7 +2,7 @@ use std::fmt;
 
 use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 
-use crate::ToUnfolded;
+use crate::{Atom, ToAtoms};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Integer {
@@ -44,15 +44,15 @@ impl Integer {
     }
 }
 
-impl fmt::Display for Integer {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.src)
+impl ToAtoms for Integer {
+    fn to_atoms(&self) -> Vec<Atom> {
+        vec![Atom::new(self.src.to_owned())]
     }
 }
 
-impl ToUnfolded for Integer {
-    fn to_unfolded(&self) -> String {
-        self.to_string()
+impl fmt::Display for Integer {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.src)
     }
 }
 

@@ -1,6 +1,6 @@
 use wast::parser::{self, Parse, Parser};
 
-use crate::{Expr, Index, Param, Result, SExpr};
+use crate::{Atom, Expr, Index, Param, Result, SExpr};
 
 /// https://webassembly.github.io/spec/core/text/modules.html#text-typeuse
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -83,7 +83,7 @@ impl SExpr for Type {
     }
 
     fn cdr(&self) -> Vec<Expr> {
-        vec![Expr::Atom(self.idx.to_string())]
+        vec![Expr::Atom(Atom::new(self.idx.to_string()))]
     }
 }
 

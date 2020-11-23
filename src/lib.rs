@@ -1,6 +1,6 @@
 pub use document::Document;
 pub use export::{Export, InlineExport};
-pub use expression::{Expression, ExpressionParser, Instruction, ToUnfolded};
+pub use expression::{Expression, ExpressionParser, Instruction, ToAtoms};
 pub use import_desc::{ImportDesc, ImportDescFunc};
 pub use index::{Index, Indexes, SymbolicIndex};
 pub use integer::{Integer, Sign};
@@ -28,7 +28,7 @@ mod section;
 mod type_use;
 mod types;
 
-use std::io;
+use std::{fmt, io};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct ToWatParams {
@@ -59,7 +59,7 @@ trait ToWat {
 }
 
 pub enum Expr {
-    Atom(String),
+    Atom(Atom),
     SExpr(Box<dyn SExpr>),
 }
 
@@ -70,7 +70,9 @@ impl ToWat for Expr {
         p: &ToWatParams,
     ) -> io::Result<()> {
         match self {
-            Self::Atom(s) => write!(w, "{}{}", " ".repeat(p.indent()), s),
+            Self::Atom(a) => {
+                write!(w, "{}{}", " ".repeat(p.indent()), a.to_string())
+            }
             Self::SExpr(se) => {
                 let open = format!("{}({}", " ".repeat(p.indent()), se.car());
 
@@ -110,6 +112,21 @@ impl ToWat for Expr {
                 write!(w, "{})", " ".repeat(p.indent()))
             }
         }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Atom(String);
+
+impl Atom {
+    pub fn new(s: String) -> Atom {
+        Self(s)
+    }
+}
+
+impl fmt::Display for Atom {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 

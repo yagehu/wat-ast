@@ -1,6 +1,6 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{Expr, Index, Integer, SExpr, ValueType};
+use crate::{Atom, Expr, Index, Integer, SExpr, ValueType};
 
 enum Paren {
     None,
@@ -23,7 +23,7 @@ pub enum Expression {
 impl Expression {
     pub(crate) fn expr(&self) -> Expr {
         match self {
-            Self::Unfolded(i) => Expr::Atom(i.to_unfolded()),
+            Self::Unfolded(i) => Expr::Atom(i.as_atom()),
             Self::Folded(i) => Expr::SExpr(Box::new(i.clone())),
         }
     }
@@ -128,11 +128,11 @@ macro_rules! instructions {
             }
         }
 
-        impl ToUnfolded for Instruction {
-            fn to_unfolded(&self) -> String {
+        impl Instruction {
+            pub fn as_atom(&self) -> Atom {
                 match self {
                     $(
-                        Self::$name(i) => i.to_unfolded(),
+                        Self::$name(i) => i.as_atom(),
                     )*
                 }
             }
@@ -179,21 +179,25 @@ macro_rules! instructions {
                 pub exprs: Vec<Expression>,
             }
 
-            impl ToUnfolded for $name {
-                fn to_unfolded(&self) -> String {
+            impl $name {
+                pub fn as_atom(&self) -> Atom {
                     #[allow(unused_mut)]
-                    let mut s = format!("{}", $instr);
+                    let mut s = String::new();
 
                     $(
-                        let argstring = self.$field_name.to_unfolded();
-
-                        if argstring.len() != 0 {
-                            s.push(' ');
-                            s.push_str(&argstring);
-                        }
+                        s.push(' ');
+                        s.push_str(
+                            &self
+                                .$field_name
+                                .to_atoms()
+                                .iter()
+                                .map(ToString::to_string)
+                                .collect::<Vec<String>>()
+                                .join(" ")
+                        );
                     )*
 
-                    s
+                    Atom::new(s)
                 }
             }
 
@@ -203,11 +207,19 @@ macro_rules! instructions {
                 }
 
                 fn cdr(&self) -> Vec<Expr> {
-                    let mut v = vec![
-                        $(
-                            Expr::Atom(self.$field_name.to_unfolded()),
-                        )*
-                    ];
+                    let mut v = Vec::new();
+
+                    $(
+                        v.append(
+                            &mut self
+                                .clone()
+                                .$field_name
+                                .to_atoms()
+                                .iter()
+                                .map(|a| Expr::Atom(a.clone()))
+                                .collect()
+                        );
+                    )*
 
                     v.append(
                         &mut self
@@ -269,12 +281,12 @@ instructions!(
     }
 );
 
-pub trait ToUnfolded {
-    fn to_unfolded(&self) -> String;
+pub trait ToAtoms {
+    fn to_atoms(&self) -> Vec<Atom>;
 }
 
-impl<T: ToString> ToUnfolded for Option<T> {
-    fn to_unfolded(&self) -> String {
-        self.as_ref().map_or("".to_owned(), |t| t.to_string())
+impl<T: ToAtoms + Clone> ToAtoms for Option<T> {
+    fn to_atoms(&self) -> Vec<Atom> {
+        self.clone().map_or(Vec::new(), |x| x.to_atoms())
     }
 }

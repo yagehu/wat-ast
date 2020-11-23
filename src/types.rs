@@ -2,7 +2,7 @@ use std::fmt;
 
 use wast::parser::{self, Parse, Parser};
 
-use crate::{Expr, Integer, Param, Result, SExpr, ToUnfolded};
+use crate::{Atom, Expr, Integer, Param, Result, SExpr, ToAtoms};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ValueType {
@@ -10,6 +10,12 @@ pub enum ValueType {
     I64,
     F32,
     F64,
+}
+
+impl ToAtoms for ValueType {
+    fn to_atoms(&self) -> Vec<Atom> {
+        vec![Atom::new(self.to_string())]
+    }
 }
 
 impl fmt::Display for ValueType {
@@ -20,12 +26,6 @@ impl fmt::Display for ValueType {
             Self::F32 => write!(f, "f32"),
             Self::F64 => write!(f, "f64"),
         }
-    }
-}
-
-impl ToUnfolded for ValueType {
-    fn to_unfolded(&self) -> String {
-        self.to_string()
     }
 }
 
@@ -116,10 +116,10 @@ pub struct Limits {
 
 impl Limits {
     pub(crate) fn exprs(&self) -> Vec<Expr> {
-        let mut v = vec![Expr::Atom(self.min.to_unfolded())];
+        let mut v = vec![Expr::Atom(Atom::new(self.min.to_string()))];
 
         if let Some(ref max) = self.max {
-            v.push(Expr::Atom(max.to_unfolded()));
+            v.push(Expr::Atom(Atom::new(max.to_string())));
         }
 
         v
@@ -164,7 +164,7 @@ impl GlobalType {
     pub(crate) fn expr(&self) -> Expr {
         match self {
             Self::Mut(m) => Expr::SExpr(Box::new(m.clone())),
-            Self::NonMut(v) => Expr::Atom(v.to_unfolded()),
+            Self::NonMut(v) => Expr::Atom(Atom::new(v.to_string())),
         }
     }
 }
@@ -202,6 +202,6 @@ impl SExpr for GlobalTypeMut {
     }
 
     fn cdr(&self) -> Vec<Expr> {
-        vec![Expr::Atom(self.val_type.to_unfolded())]
+        vec![Expr::Atom(Atom::new(self.val_type.to_string()))]
     }
 }

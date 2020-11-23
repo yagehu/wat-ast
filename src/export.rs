@@ -1,6 +1,6 @@
 use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 
-use crate::{Expr, FunctionSectionEntry, SExpr};
+use crate::{Atom, Expr, FunctionSectionEntry, SExpr};
 
 /// https://webassembly.github.io/spec/core/text/modules.html#text-global-abbrev
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -14,7 +14,7 @@ impl SExpr for InlineExport {
     }
 
     fn cdr(&self) -> Vec<Expr> {
-        vec![Expr::Atom(self.name.clone())]
+        vec![Expr::Atom(Atom::new(self.name.clone()))]
     }
 }
 
@@ -41,7 +41,7 @@ impl SExpr for Export {
 
     fn cdr(&self) -> Vec<Expr> {
         vec![
-            Expr::Atom(self.name.clone()),
+            Expr::Atom(Atom::new(self.name.clone())),
             Expr::SExpr(Box::new(self.desc.clone())),
         ]
     }

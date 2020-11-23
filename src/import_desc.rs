@@ -1,6 +1,6 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{Expr, Index, SExpr, TypeUse};
+use crate::{Atom, Expr, Index, SExpr, TypeUse};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ImportDesc {
@@ -49,7 +49,7 @@ impl SExpr for ImportDescFunc {
         let mut v = Vec::new();
 
         if let Some(ref idx) = self.idx {
-            v.push(Expr::Atom(idx.to_string()));
+            v.push(Expr::Atom(Atom::new(idx.to_string())));
         }
 
         v.append(&mut self.type_use.exprs());

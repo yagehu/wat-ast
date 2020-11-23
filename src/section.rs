@@ -1,7 +1,7 @@
 use wast::parser::{Parse, Parser, Result};
 
 use crate::{
-    Expr, Expression, ExpressionParser, FuncType, GlobalType, ImportDesc,
+    Atom, Expr, Expression, ExpressionParser, FuncType, GlobalType, ImportDesc,
     Index, InlineExport, MemType, SExpr, TypeUse,
 };
 
@@ -98,7 +98,7 @@ impl SExpr for TypeSectionEntry {
         let mut v = Vec::new();
 
         if let Some(ref idx) = self.idx {
-            v.push(Expr::Atom(idx.to_string()));
+            v.push(Expr::Atom(Atom::new(idx.to_string())));
         }
 
         v.push(Expr::SExpr(Box::new(self.func_type.clone())));
@@ -162,8 +162,8 @@ impl SExpr for ImportSectionEntry {
 
     fn cdr(&self) -> Vec<Expr> {
         vec![
-            Expr::Atom(self.module.to_string()),
-            Expr::Atom(self.name.to_string()),
+            Expr::Atom(Atom::new(self.module.to_string())),
+            Expr::Atom(Atom::new(self.name.to_string())),
             Expr::SExpr(Box::new(self.desc.clone())),
         ]
     }
@@ -228,7 +228,7 @@ impl SExpr for FunctionSectionEntry {
         let mut v = Vec::new();
 
         if let Some(ref idx) = self.idx {
-            v.push(Expr::Atom(idx.to_string()));
+            v.push(Expr::Atom(Atom::new(idx.to_string())));
         }
 
         if let Some(ref inline_export) = self.inline_export {
@@ -312,7 +312,7 @@ impl SExpr for MemorySectionEntry {
         let mut v = Vec::new();
 
         if let Some(ref idx) = self.idx {
-            v.push(Expr::Atom(idx.to_string()));
+            v.push(Expr::Atom(Atom::new(idx.to_string())));
         }
 
         if let Some(ref inline_export) = self.inline_export {
@@ -395,7 +395,7 @@ impl SExpr for GlobalSectionEntry {
         let mut v = Vec::new();
 
         if let Some(ref idx) = self.idx {
-            v.push(Expr::Atom(idx.to_string()));
+            v.push(Expr::Atom(Atom::new(idx.to_string())));
         }
 
         if let Some(ref inline_export) = self.inline_export {
@@ -531,7 +531,10 @@ pub struct DataString {
 
 impl DataString {
     pub(crate) fn exprs(&self) -> Vec<Expr> {
-        self.strs.iter().map(|s| Expr::Atom(s.clone())).collect()
+        self.strs
+            .iter()
+            .map(|s| Expr::Atom(Atom::new(s.clone())))
+            .collect()
     }
 }
 
@@ -563,7 +566,7 @@ impl SExpr for DataSectionEntry {
         let mut v = Vec::new();
 
         if let Some(idx) = self.idx.clone() {
-            v.push(Expr::Atom(idx.to_string()));
+            v.push(Expr::Atom(Atom::new(idx.to_string())));
         }
 
         v.push(self.offset.expr());

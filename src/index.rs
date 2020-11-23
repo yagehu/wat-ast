@@ -2,7 +2,7 @@ use std::fmt;
 
 use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 
-use crate::{Integer, Sign, ToUnfolded};
+use crate::{Atom, Integer, Sign, ToAtoms};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Index {
@@ -19,12 +19,6 @@ impl fmt::Display for Index {
     }
 }
 
-impl ToUnfolded for Index {
-    fn to_unfolded(&self) -> String {
-        self.to_string()
-    }
-}
-
 impl Parse<'_> for Index {
     fn parse(parser: Parser<'_>) -> Result<Self> {
         match parser.parse::<NumericIndex>() {
@@ -33,6 +27,15 @@ impl Parse<'_> for Index {
                 Ok(si) => Ok(Self::Symbolic(si)),
                 Err(err) => Err(err),
             },
+        }
+    }
+}
+
+impl ToAtoms for Index {
+    fn to_atoms(&self) -> Vec<Atom> {
+        match self {
+            Self::Numeric(i) => i.to_atoms(),
+            Self::Symbolic(i) => i.to_atoms(),
         }
     }
 }
@@ -89,6 +92,12 @@ impl NumericIndex {
     /// the base that it should be parsed in
     pub fn val(&self) -> (&str, u32) {
         self.i.val()
+    }
+}
+
+impl ToAtoms for NumericIndex {
+    fn to_atoms(&self) -> Vec<Atom> {
+        vec![Atom::new(self.i.to_string())]
     }
 }
 
@@ -149,6 +158,12 @@ impl SymbolicIndex {
 impl fmt::Display for SymbolicIndex {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "${}", self.name)
+    }
+}
+
+impl ToAtoms for SymbolicIndex {
+    fn to_atoms(&self) -> Vec<Atom> {
+        vec![Atom::new(self.name.clone())]
     }
 }
 

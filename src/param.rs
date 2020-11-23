@@ -1,6 +1,6 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{Expr, SExpr, ValueType};
+use crate::{Atom, Expr, SExpr, ValueType};
 
 /// https://webassembly.github.io/spec/core/text/types.html#text-functype
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -16,7 +16,7 @@ impl SExpr for Param {
     fn cdr(&self) -> Vec<Expr> {
         self.value_types
             .iter()
-            .map(|v| Expr::Atom(v.to_string()))
+            .map(|v| Expr::Atom(Atom::new(v.to_string())))
             .collect()
     }
 }
