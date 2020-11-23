@@ -52,18 +52,24 @@ impl Peek for Index {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Indexes {
-    pub ids: Vec<Index>,
+    pub idxs: Vec<Index>,
+}
+
+impl ToAtoms for Indexes {
+    fn to_atoms(&self) -> Vec<Atom> {
+        self.idxs.iter().map(|i| Atom::new(i.to_string())).collect()
+    }
 }
 
 impl Parse<'_> for Indexes {
     fn parse(parser: Parser<'_>) -> Result<Self> {
-        let mut ids = Vec::new();
+        let mut idxs = Vec::new();
 
         while parser.peek::<Index>() {
-            ids.push(parser.parse()?);
+            idxs.push(parser.parse()?);
         }
 
-        Ok(Self { ids })
+        Ok(Self { idxs })
     }
 }
 
