@@ -1,6 +1,6 @@
 pub use document::Document;
 pub use export::{Export, InlineExport};
-pub use expression::{Expression, ExpressionParser, Instruction, ToAtoms};
+pub use expression::{AsAtoms, Expression, ExpressionParser, Instruction};
 pub use import_desc::{ImportDesc, ImportDescFunc};
 pub use index::{Index, Indexes, SymbolicIndex};
 pub use integer::{Integer, Sign};

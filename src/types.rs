@@ -2,7 +2,7 @@ use std::fmt;
 
 use wast::parser::{self, Parse, Parser};
 
-use crate::{Atom, Expr, Integer, Param, Result, SExpr, ToAtoms};
+use crate::{AsAtoms, Atom, Expr, Integer, Param, Result, SExpr};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ValueType {
@@ -12,8 +12,8 @@ pub enum ValueType {
     F64,
 }
 
-impl ToAtoms for ValueType {
-    fn to_atoms(&self) -> Vec<Atom> {
+impl AsAtoms for ValueType {
+    fn as_atoms(&self) -> Vec<Atom> {
         vec![Atom::new(self.to_string())]
     }
 }

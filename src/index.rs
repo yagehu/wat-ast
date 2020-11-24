@@ -2,7 +2,7 @@ use std::fmt;
 
 use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 
-use crate::{Atom, Integer, Sign, ToAtoms};
+use crate::{AsAtoms, Atom, Integer, Sign};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Index {
@@ -31,11 +31,11 @@ impl Parse<'_> for Index {
     }
 }
 
-impl ToAtoms for Index {
-    fn to_atoms(&self) -> Vec<Atom> {
+impl AsAtoms for Index {
+    fn as_atoms(&self) -> Vec<Atom> {
         match self {
-            Self::Numeric(i) => i.to_atoms(),
-            Self::Symbolic(i) => i.to_atoms(),
+            Self::Numeric(i) => i.as_atoms(),
+            Self::Symbolic(i) => i.as_atoms(),
         }
     }
 }
@@ -55,8 +55,8 @@ pub struct Indexes {
     pub idxs: Vec<Index>,
 }
 
-impl ToAtoms for Indexes {
-    fn to_atoms(&self) -> Vec<Atom> {
+impl AsAtoms for Indexes {
+    fn as_atoms(&self) -> Vec<Atom> {
         self.idxs.iter().map(|i| Atom::new(i.to_string())).collect()
     }
 }
@@ -101,8 +101,8 @@ impl NumericIndex {
     }
 }
 
-impl ToAtoms for NumericIndex {
-    fn to_atoms(&self) -> Vec<Atom> {
+impl AsAtoms for NumericIndex {
+    fn as_atoms(&self) -> Vec<Atom> {
         vec![Atom::new(self.i.to_string())]
     }
 }
@@ -167,8 +167,8 @@ impl fmt::Display for SymbolicIndex {
     }
 }
 
-impl ToAtoms for SymbolicIndex {
-    fn to_atoms(&self) -> Vec<Atom> {
+impl AsAtoms for SymbolicIndex {
+    fn as_atoms(&self) -> Vec<Atom> {
         vec![Atom::new(self.name.clone())]
     }
 }

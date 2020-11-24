@@ -189,7 +189,7 @@ macro_rules! instructions {
                         s.push_str(
                             &self
                                 .$field_name
-                                .to_atoms()
+                                .as_atoms()
                                 .iter()
                                 .map(ToString::to_string)
                                 .collect::<Vec<std::string::String>>()
@@ -214,7 +214,7 @@ macro_rules! instructions {
                             &mut self
                                 .clone()
                                 .$field_name
-                                .to_atoms()
+                                .as_atoms()
                                 .iter()
                                 .map(|a| Expr::Atom(a.clone()))
                                 .collect()
@@ -281,18 +281,18 @@ instructions!(
     }
 );
 
-pub trait ToAtoms {
-    fn to_atoms(&self) -> Vec<Atom>;
+pub trait AsAtoms {
+    fn as_atoms(&self) -> Vec<Atom>;
 }
 
-impl ToAtoms for String {
-    fn to_atoms(&self) -> Vec<Atom> {
+impl AsAtoms for String {
+    fn as_atoms(&self) -> Vec<Atom> {
         vec![Atom::new(format!(r#""{}""#, self))]
     }
 }
 
-impl<T: ToAtoms + Clone> ToAtoms for Option<T> {
-    fn to_atoms(&self) -> Vec<Atom> {
-        self.clone().map_or(Vec::new(), |x| x.to_atoms())
+impl<T: AsAtoms + Clone> AsAtoms for Option<T> {
+    fn as_atoms(&self) -> Vec<Atom> {
+        self.clone().map_or(Vec::new(), |x| x.as_atoms())
     }
 }

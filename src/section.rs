@@ -1,8 +1,8 @@
 use wast::parser::{Parse, Parser, Result};
 
 use crate::{
-    Atom, Expr, Expression, ExpressionParser, FuncType, GlobalType, ImportDesc,
-    Index, InlineExport, MemType, SExpr, TypeUse,
+    AsAtoms, Atom, Expr, Expression, ExpressionParser, FuncType, GlobalType,
+    ImportDesc, Index, InlineExport, MemType, SExpr, TypeUse,
 };
 
 /// https://webassembly.github.io/spec/core/text/modules.html#text-module
@@ -161,11 +161,27 @@ impl SExpr for ImportSectionEntry {
     }
 
     fn cdr(&self) -> Vec<Expr> {
-        vec![
-            Expr::Atom(Atom::new(self.module.to_string())),
-            Expr::Atom(Atom::new(self.name.to_string())),
-            Expr::SExpr(Box::new(self.desc.clone())),
-        ]
+        let mut v = Vec::with_capacity(3);
+
+        v.append(
+            &mut self
+                .module
+                .as_atoms()
+                .iter()
+                .map(|a| Expr::Atom(a.clone()))
+                .collect(),
+        );
+        v.append(
+            &mut self
+                .name
+                .as_atoms()
+                .iter()
+                .map(|a| Expr::Atom(a.clone()))
+                .collect(),
+        );
+        v.push(Expr::SExpr(Box::new(self.desc.clone())));
+
+        v
     }
 }
 

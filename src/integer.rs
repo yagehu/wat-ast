@@ -2,7 +2,7 @@ use std::fmt;
 
 use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 
-use crate::{Atom, ToAtoms};
+use crate::{AsAtoms, Atom};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Integer {
@@ -44,8 +44,8 @@ impl Integer {
     }
 }
 
-impl ToAtoms for Integer {
-    fn to_atoms(&self) -> Vec<Atom> {
+impl AsAtoms for Integer {
+    fn as_atoms(&self) -> Vec<Atom> {
         vec![Atom::new(self.src.to_owned())]
     }
 }
