@@ -1,6 +1,6 @@
 use std::fmt;
 
-use wast::parser::{self, Parse, Parser};
+use wast::parser::{self, Cursor, Parse, Parser, Peek};
 
 use crate::{AsAtoms, Atom, Expr, Integer, Param, Result, SExpr};
 
@@ -12,6 +12,12 @@ pub enum ValueType {
     F64,
 }
 
+impl ValueType {
+    pub fn as_expr(&self) -> Expr {
+        Expr::Atom(Atom::new(self.to_string()))
+    }
+}
+
 impl AsAtoms for ValueType {
     fn as_atoms(&self) -> Vec<Atom> {
         vec![Atom::new(self.to_string())]
@@ -21,10 +27,10 @@ impl AsAtoms for ValueType {
 impl fmt::Display for ValueType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::I32 => write!(f, "i32"),
-            Self::I64 => write!(f, "i64"),
-            Self::F32 => write!(f, "f32"),
-            Self::F64 => write!(f, "f64"),
+            | Self::I32 => write!(f, "i32"),
+            | Self::I64 => write!(f, "i64"),
+            | Self::F32 => write!(f, "f32"),
+            | Self::F64 => write!(f, "f64"),
         }
     }
 }
@@ -51,10 +57,23 @@ impl Parse<'_> for ValueType {
     }
 }
 
+impl Peek for ValueType {
+    fn peek(cursor: Cursor<'_>) -> bool {
+        wast::kw::i32::peek(cursor)
+            || wast::kw::i64::peek(cursor)
+            || wast::kw::f32::peek(cursor)
+            || wast::kw::f64::peek(cursor)
+    }
+
+    fn display() -> &'static str {
+        "a value type"
+    }
+}
+
 /// https://webassembly.github.io/spec/core/text/types.html#function-types
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FuncType {
-    pub params: Vec<Param>,
+    pub params:  Vec<Param>,
     pub results: Vec<Result>,
 }
 
@@ -163,8 +182,8 @@ pub enum GlobalType {
 impl GlobalType {
     pub(crate) fn expr(&self) -> Expr {
         match self {
-            Self::Mut(m) => Expr::SExpr(Box::new(m.clone())),
-            Self::NonMut(v) => Expr::Atom(Atom::new(v.to_string())),
+            | Self::Mut(m) => Expr::SExpr(Box::new(m.clone())),
+            | Self::NonMut(v) => Expr::Atom(Atom::new(v.to_string())),
         }
     }
 }

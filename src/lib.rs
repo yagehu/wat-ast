@@ -5,6 +5,7 @@ pub use import_desc::{ImportDesc, ImportDescFunc};
 pub use index::{Index, Indexes, SymbolicIndex};
 pub use integer::{Integer, Sign};
 pub use module::Module;
+pub use named_value_type::NamedValueType;
 pub use param::Param;
 pub use result::Result;
 pub use section::{
@@ -22,6 +23,7 @@ mod import_desc;
 mod index;
 mod integer;
 mod module;
+mod named_value_type;
 mod param;
 mod result;
 mod section;
@@ -72,7 +74,7 @@ impl ToWat for Expr {
         match self {
             Self::Atom(a) => {
                 write!(w, "{}{}", " ".repeat(p.indent()), a.to_string())
-            }
+            },
             Self::SExpr(se) => {
                 let open = format!("{}({}", " ".repeat(p.indent()), se.car());
 
@@ -110,7 +112,7 @@ impl ToWat for Expr {
                 }
 
                 write!(w, "{})", " ".repeat(p.indent()))
-            }
+            },
         }
     }
 }

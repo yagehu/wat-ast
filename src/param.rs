@@ -1,11 +1,12 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{Atom, Expr, SExpr, ValueType};
+use crate::{Expr, NamedValueType, SExpr, ValueType};
 
 /// https://webassembly.github.io/spec/core/text/types.html#text-functype
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Param {
-    pub value_types: Vec<ValueType>,
+pub enum Param {
+    Named(NamedValueType),
+    Anonymous(Vec<ValueType>),
 }
 
 impl SExpr for Param {
@@ -14,23 +15,27 @@ impl SExpr for Param {
     }
 
     fn cdr(&self) -> Vec<Expr> {
-        self.value_types
-            .iter()
-            .map(|v| Expr::Atom(Atom::new(v.to_string())))
-            .collect()
+        match self {
+            | Self::Named(n) => n.as_exprs(),
+            | Self::Anonymous(vv) => {
+                vv.iter().map(ValueType::as_expr).collect()
+            },
+        }
     }
 }
 
 impl Parse<'_> for Param {
     fn parse(parser: Parser<'_>) -> Result<Self> {
-        parser.parse::<wast::kw::param>()?;
+        if parser.peek::<ValueType>() {
+            let mut v = Vec::new();
 
-        let mut value_types = Vec::new();
+            while !parser.is_empty() {
+                v.push(parser.parse::<ValueType>()?);
+            }
 
-        while !parser.is_empty() {
-            value_types.push(parser.parse()?);
+            Ok(Self::Anonymous(v))
+        } else {
+            Ok(Self::Named(parser.parse::<NamedValueType>()?))
         }
-
-        Ok(Self { value_types })
     }
 }
