@@ -4,7 +4,13 @@ use crate::{Expr, SExpr, Section};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Module {
-    pub sections: Vec<Section>,
+    sections: Vec<Section>,
+}
+
+impl Module {
+    pub fn with_sections(sections: Vec<Section>) -> Self {
+        Self { sections }
+    }
 }
 
 impl Parse<'_> for Module {

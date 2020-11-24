@@ -6,7 +6,13 @@ use crate::{Expr, Module, ToWat, ToWatParams};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Document {
-    pub module: Module,
+    module: Module,
+}
+
+impl Document {
+    pub fn new(module: Module) -> Self {
+        Self { module }
+    }
 }
 
 impl fmt::Display for Document {
@@ -15,7 +21,7 @@ impl fmt::Display for Document {
             f,
             "{}",
             Expr::SExpr(Box::new(self.module.clone())).to_wat(&ToWatParams {
-                indent_size: 2,
+                indent_size:  2,
                 indent_level: 0,
             })
         )
@@ -42,7 +48,7 @@ mod tests {
             )
             .unwrap(),
             Document {
-                module: Module { sections: vec![] },
+                module: Module::with_sections(Vec::new()),
             },
         )
     }
@@ -51,9 +57,7 @@ mod tests {
     fn output_empty_module() {
         assert_eq!(
             Document {
-                module: Module {
-                    sections: Vec::new(),
-                },
+                module: Module::with_sections(Vec::new()),
             }
             .to_string(),
             "(module)",

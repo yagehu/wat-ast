@@ -55,10 +55,14 @@ impl Parse<'_> for Section {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeSection {
-    pub entries: Vec<TypeSectionEntry>,
+    entries: Vec<TypeSectionEntry>,
 }
 
 impl TypeSection {
+    pub fn with_entries(entries: Vec<TypeSectionEntry>) -> Self {
+        Self { entries }
+    }
+
     pub(crate) fn exprs(&self) -> Vec<Expr> {
         self.entries
             .iter()
@@ -85,8 +89,14 @@ impl Parse<'_> for TypeSection {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeSectionEntry {
-    pub idx: Option<Index>,
-    pub func_type: FuncType,
+    idx:       Option<Index>,
+    func_type: FuncType,
+}
+
+impl TypeSectionEntry {
+    pub fn new(idx: Option<Index>, func_type: FuncType) -> Self {
+        Self { idx, func_type }
+    }
 }
 
 impl SExpr for TypeSectionEntry {
@@ -120,10 +130,14 @@ impl Parse<'_> for TypeSectionEntry {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImportSection {
-    pub entries: Vec<ImportSectionEntry>,
+    entries: Vec<ImportSectionEntry>,
 }
 
 impl ImportSection {
+    pub fn with_entries(entries: Vec<ImportSectionEntry>) -> Self {
+        Self { entries }
+    }
+
     pub(crate) fn exprs(&self) -> Vec<Expr> {
         self.entries
             .iter()
@@ -150,9 +164,15 @@ impl Parse<'_> for ImportSection {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImportSectionEntry {
-    pub module: String,
-    pub name: String,
-    pub desc: ImportDesc,
+    module: String,
+    name:   String,
+    desc:   ImportDesc,
+}
+
+impl ImportSectionEntry {
+    pub fn new(module: String, name: String, desc: ImportDesc) -> Self {
+        Self { module, name, desc }
+    }
 }
 
 impl SExpr for ImportSectionEntry {
@@ -199,10 +219,14 @@ impl Parse<'_> for ImportSectionEntry {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FunctionSection {
-    pub entries: Vec<FunctionSectionEntry>,
+    entries: Vec<FunctionSectionEntry>,
 }
 
 impl FunctionSection {
+    pub fn with_entries(entries: Vec<FunctionSectionEntry>) -> Self {
+        Self { entries }
+    }
+
     pub(crate) fn exprs(&self) -> Vec<Expr> {
         self.entries
             .iter()
@@ -229,10 +253,26 @@ impl Parse<'_> for FunctionSection {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FunctionSectionEntry {
-    pub idx: Option<Index>,
-    pub inline_export: Option<InlineExport>,
-    pub type_use: TypeUse,
-    pub exprs: Vec<Expression>,
+    idx:           Option<Index>,
+    inline_export: Option<InlineExport>,
+    type_use:      TypeUse,
+    exprs:         Vec<Expression>,
+}
+
+impl FunctionSectionEntry {
+    pub fn new(
+        idx: Option<Index>,
+        inline_export: Option<InlineExport>,
+        type_use: TypeUse,
+        exprs: Vec<Expression>,
+    ) -> Self {
+        Self {
+            idx,
+            inline_export,
+            type_use,
+            exprs,
+        }
+    }
 }
 
 impl SExpr for FunctionSectionEntry {
@@ -284,10 +324,14 @@ impl Parse<'_> for FunctionSectionEntry {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MemorySection {
-    pub entries: Vec<MemorySectionEntry>,
+    entries: Vec<MemorySectionEntry>,
 }
 
 impl MemorySection {
+    pub fn with_entries(entries: Vec<MemorySectionEntry>) -> Self {
+        Self { entries }
+    }
+
     pub(crate) fn exprs(&self) -> Vec<Expr> {
         self.entries
             .iter()
@@ -314,9 +358,9 @@ impl Parse<'_> for MemorySection {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MemorySectionEntry {
-    pub idx: Option<Index>,
+    pub idx:           Option<Index>,
     pub inline_export: Option<InlineExport>,
-    pub mem_type: MemType,
+    pub mem_type:      MemType,
 }
 
 impl SExpr for MemorySectionEntry {
@@ -364,10 +408,14 @@ impl Parse<'_> for MemorySectionEntry {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GlobalSection {
-    pub entries: Vec<GlobalSectionEntry>,
+    entries: Vec<GlobalSectionEntry>,
 }
 
 impl GlobalSection {
+    pub fn with_entries(entries: Vec<GlobalSectionEntry>) -> Self {
+        Self { entries }
+    }
+
     pub(crate) fn exprs(&self) -> Vec<Expr> {
         self.entries
             .iter()
@@ -394,9 +442,9 @@ impl Parse<'_> for GlobalSection {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GlobalSectionEntry {
-    pub idx: Option<Index>,
+    pub idx:           Option<Index>,
     pub inline_export: Option<InlineExport>,
-    pub global_type: GlobalType,
+    pub global_type:   GlobalType,
 
     /// An imported global does not have expr.
     pub expr: Option<Expression>,
@@ -464,10 +512,14 @@ impl Parse<'_> for GlobalSectionEntry {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DataSection {
-    pub entries: Vec<DataSectionEntry>,
+    entries: Vec<DataSectionEntry>,
 }
 
 impl DataSection {
+    pub fn with_entries(entries: Vec<DataSectionEntry>) -> Self {
+        Self { entries }
+    }
+
     pub(crate) fn exprs(&self) -> Vec<Expr> {
         self.entries
             .iter()
@@ -542,12 +594,16 @@ impl Parse<'_> for Offset {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DataString {
-    pub strs: Vec<String>,
+    strings: Vec<String>,
 }
 
 impl DataString {
+    pub fn with_strings(strings: Vec<String>) -> Self {
+        Self { strings }
+    }
+
     pub(crate) fn exprs(&self) -> Vec<Expr> {
-        self.strs
+        self.strings
             .iter()
             .map(|s| Expr::Atom(Atom::new(s.clone())))
             .collect()
@@ -556,21 +612,36 @@ impl DataString {
 
 impl Parse<'_> for DataString {
     fn parse(parser: Parser<'_>) -> Result<Self> {
-        let mut strs = Vec::new();
+        let mut strings = Vec::new();
 
         while !parser.is_empty() {
-            strs.push(parser.parse::<String>()?);
+            strings.push(parser.parse::<String>()?);
         }
 
-        Ok(Self { strs })
+        Ok(Self { strings })
     }
 }
 
+/// https://webassembly.github.io/spec/core/text/modules.html#data-segments
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DataSectionEntry {
-    pub idx: Option<Index>,
-    pub offset: Offset,
-    pub data_string: DataString,
+    idx:         Option<Index>,
+    offset:      Offset,
+    data_string: DataString,
+}
+
+impl DataSectionEntry {
+    pub fn new(
+        idx: Option<Index>,
+        offset: Offset,
+        data_string: DataString,
+    ) -> Self {
+        Self {
+            idx,
+            offset,
+            data_string,
+        }
+    }
 }
 
 impl SExpr for DataSectionEntry {

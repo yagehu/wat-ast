@@ -4,7 +4,13 @@ use crate::{Atom, Expr, SExpr, ValueType};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Result {
-    pub value_types: Vec<ValueType>,
+    value_types: Vec<ValueType>,
+}
+
+impl Result {
+    pub fn with_value_types(value_types: Vec<ValueType>) -> Self {
+        Self { value_types }
+    }
 }
 
 impl SExpr for Result {

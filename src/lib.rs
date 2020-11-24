@@ -1,6 +1,6 @@
 pub use document::Document;
 pub use export::{Export, InlineExport};
-pub use expression::{AsAtoms, Expression, ExpressionParser, Instruction};
+pub use expression::{AsAtoms, Expression, Instruction};
 pub use import_desc::{ImportDesc, ImportDescFunc};
 pub use index::{Index, Indexes, SymbolicIndex};
 pub use integer::{Integer, Sign};
@@ -32,9 +32,11 @@ mod types;
 
 use std::{fmt, io};
 
+pub(crate) use expression::ExpressionParser;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct ToWatParams {
-    indent_size: usize,
+    indent_size:  usize,
     indent_level: usize,
 }
 
@@ -87,7 +89,7 @@ impl ToWat for Expr {
                     .iter()
                     .map(|expr| {
                         expr.to_wat(&ToWatParams {
-                            indent_size: 2,
+                            indent_size:  2,
                             indent_level: 0,
                         })
                     })
@@ -104,7 +106,7 @@ impl ToWat for Expr {
                     expr.write_wat(
                         w,
                         &ToWatParams {
-                            indent_size: p.indent_size,
+                            indent_size:  p.indent_size,
                             indent_level: p.indent_level + 1,
                         },
                     )?;

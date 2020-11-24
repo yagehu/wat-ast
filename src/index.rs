@@ -52,7 +52,13 @@ impl Peek for Index {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Indexes {
-    pub idxs: Vec<Index>,
+    idxs: Vec<Index>,
+}
+
+impl Indexes {
+    pub fn new(idxs: Vec<Index>) -> Self {
+        Self { idxs }
+    }
 }
 
 impl AsAtoms for Indexes {
@@ -75,12 +81,16 @@ impl Parse<'_> for Indexes {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NumericIndex {
-    i: Integer,
-    span: wast::Span,
+    i:    Integer,
+    span: Option<wast::Span>,
 }
 
 impl NumericIndex {
-    pub fn span(&self) -> wast::Span {
+    pub fn new(i: Integer) -> Self {
+        Self { i, span: None }
+    }
+
+    pub fn span(&self) -> Option<wast::Span> {
         self.span
     }
 
@@ -96,7 +106,7 @@ impl NumericIndex {
 
     /// Returns the value string that can be parsed for this integer, as well as
     /// the base that it should be parsed in
-    pub fn val(&self) -> (&str, u32) {
+    pub fn val(&self) -> (Option<&String>, u32) {
         self.i.val()
     }
 }
@@ -109,7 +119,7 @@ impl AsAtoms for NumericIndex {
 
 impl Parse<'_> for NumericIndex {
     fn parse(parser: Parser<'_>) -> Result<Self> {
-        let span = parser.cur_span();
+        let span = Some(parser.cur_span());
         let int = parser.step(|cursor| match cursor.integer() {
             Some((i, cur)) => Ok((i, cur)),
             None => Err(cursor.error("not an integer")),
@@ -120,7 +130,12 @@ impl Parse<'_> for NumericIndex {
         });
         let (val, radix) = int.val();
         let hex = if radix == 16 { true } else { false };
-        let i = Integer::new(sign, int.src().to_owned(), val.to_owned(), hex);
+        let i = Integer {
+            sign,
+            src: int.src().to_owned(),
+            val: Some(val.to_owned()),
+            hex,
+        };
 
         Ok(Self { i, span })
     }

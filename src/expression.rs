@@ -9,9 +9,9 @@ enum Paren {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Level {
-    pub expr: Expression,
-    pub subexprs: Vec<Expression>,
+struct Level {
+    expr:     Expression,
+    subexprs: Vec<Expression>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,7 +37,7 @@ impl Expression {
 }
 
 #[derive(Default)]
-pub struct ExpressionParser {
+pub(crate) struct ExpressionParser {
     exprs: Vec<Expression>,
     stack: Vec<Level>,
 }
@@ -49,10 +49,10 @@ impl ExpressionParser {
                 Paren::Left => {
                     let instr = parser.parse::<Instruction>()?;
                     self.stack.push(Level {
-                        expr: Expression::Folded(instr),
+                        expr:     Expression::Folded(instr),
                         subexprs: Vec::new(),
                     });
-                }
+                },
                 Paren::None => {
                     let instr = parser.parse::<Instruction>()?;
                     let expr = Expression::Unfolded(instr);
@@ -61,7 +61,7 @@ impl ExpressionParser {
                         Some(level) => level.subexprs.push(expr),
                         None => self.exprs.push(expr),
                     }
-                }
+                },
                 Paren::Right => match self.stack.pop() {
                     Some(mut level) => {
                         level.expr.subexprs().append(&mut level.subexprs);
@@ -71,8 +71,8 @@ impl ExpressionParser {
                         } else {
                             self.exprs.push(level.expr);
                         }
-                    }
-                    None => {}
+                    },
+                    None => {},
                 },
             }
         }

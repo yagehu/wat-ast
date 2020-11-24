@@ -36,8 +36,14 @@ impl Parse<'_> for ImportDesc {
 /// https://webassembly.github.io/spec/core/text/modules.html#text-importdesc
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImportDescFunc {
-    pub idx: Option<Index>,
-    pub type_use: TypeUse,
+    idx:      Option<Index>,
+    type_use: TypeUse,
+}
+
+impl ImportDescFunc {
+    pub fn new(idx: Option<Index>, type_use: TypeUse) -> Self {
+        Self { idx, type_use }
+    }
 }
 
 impl SExpr for ImportDescFunc {

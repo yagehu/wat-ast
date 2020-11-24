@@ -5,7 +5,13 @@ use crate::{Atom, Expr, FunctionSectionEntry, SExpr};
 /// https://webassembly.github.io/spec/core/text/modules.html#text-global-abbrev
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InlineExport {
-    pub name: String,
+    name: String,
+}
+
+impl InlineExport {
+    pub fn new(name: String) -> Self {
+        Self { name }
+    }
 }
 
 impl SExpr for InlineExport {
@@ -30,8 +36,14 @@ impl Parse<'_> for InlineExport {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Export {
-    pub name: String,
-    pub desc: ExportDesc,
+    name: String,
+    desc: ExportDesc,
+}
+
+impl Export {
+    pub fn new(name: String, desc: ExportDesc) -> Self {
+        Self { name, desc }
+    }
 }
 
 impl SExpr for Export {

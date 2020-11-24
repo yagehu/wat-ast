@@ -6,23 +6,18 @@ use crate::{AsAtoms, Atom};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Integer {
-    sign: Option<Sign>,
-    src: String,
-    val: String,
-    hex: bool,
+    pub(crate) sign: Option<Sign>,
+    pub(crate) src:  String,
+    pub(crate) val:  Option<String>,
+    pub(crate) hex:  bool,
 }
 
 impl Integer {
-    pub fn new(
-        sign: Option<Sign>,
-        src: String,
-        val: String,
-        hex: bool,
-    ) -> Self {
+    pub fn new(sign: Option<Sign>, src: String, hex: bool) -> Self {
         Self {
             sign,
             src,
-            val,
+            val: None,
             hex,
         }
     }
@@ -39,8 +34,8 @@ impl Integer {
 
     /// Returns the value string that can be parsed for this integer, as well as
     /// the base that it should be parsed in
-    pub fn val(&self) -> (&str, u32) {
-        (&self.val, if self.hex { 16 } else { 10 })
+    pub fn val(&self) -> (Option<&String>, u32) {
+        (self.val.as_ref(), if self.hex { 16 } else { 10 })
     }
 }
 
@@ -63,7 +58,7 @@ impl Parse<'_> for Integer {
                 let src = s.src().to_owned();
                 let mut sign = None;
                 let (val_ref, base) = s.val();
-                let val = val_ref.to_owned();
+                let val = Some(val_ref.to_owned());
                 let hex = if base == 16 { true } else { false };
 
                 if let Some(si) = s.sign() {
@@ -82,7 +77,7 @@ impl Parse<'_> for Integer {
                     },
                     cur,
                 ))
-            }
+            },
             None => Err(parser.error("could not parse integer")),
         })
     }
