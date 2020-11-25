@@ -193,7 +193,7 @@ impl fmt::Display for SymbolicIndex {
 
 impl AsAtoms for SymbolicIndex {
     fn as_atoms(&self) -> Vec<Atom> {
-        vec![Atom::new(self.name.clone())]
+        vec![Atom::new(self.to_string())]
     }
 }
 
