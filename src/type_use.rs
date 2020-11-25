@@ -5,12 +5,24 @@ use crate::{Atom, Expr, Index, Param, Result, SExpr};
 /// https://webassembly.github.io/spec/core/text/modules.html#text-typeuse
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeUse {
-    pub type_def: Option<Type>,
-    pub params: Vec<Param>,
-    pub results: Vec<Result>,
+    type_def: Option<Type>,
+    params:   Vec<Param>,
+    results:  Vec<Result>,
 }
 
 impl TypeUse {
+    pub fn new(
+        type_def: Option<Type>,
+        params: Vec<Param>,
+        results: Vec<Result>,
+    ) -> Self {
+        Self {
+            type_def,
+            params,
+            results,
+        }
+    }
+
     pub(crate) fn exprs(&self) -> Vec<Expr> {
         let mut v = Vec::new();
 
