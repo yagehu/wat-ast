@@ -3,7 +3,7 @@ pub use export::{Export, InlineExport};
 pub use expression::{
     fold, i32_const, local_get, AsAtoms, Block, Br, BrIf, BrTable, Call, Drop,
     Expression, GlobalGet, GlobalSet, I32Add, I32Const, I32Eq, I32Eqz, I32GtU,
-    I32Ne, I32RemU, I32Sub, I64Const, If, Instruction, Local, LocalGet,
+    I32LtU, I32Ne, I32RemU, I32Sub, I64Const, If, Instruction, Local, LocalGet,
     LocalSet, LocalTee, Loop, Then,
 };
 pub use import_desc::{ImportDesc, ImportDescFunc};
