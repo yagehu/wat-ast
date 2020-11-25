@@ -1,6 +1,8 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{Atom, Expr, Index, Integer, SExpr, Sign, ValueType};
+use crate::{
+    Atom, Expr, Index, Integer, SExpr, Sign, SymbolicIndex, ValueType,
+};
 
 pub fn fold(i: Instruction) -> Expression {
     Expression::Folded(i)
@@ -14,6 +16,13 @@ pub fn i32_const<S: AsRef<str>>(
     Instruction::I32Const(I32Const {
         integer: Integer::new(sign, s.as_ref().to_owned(), hex),
         exprs:   vec![],
+    })
+}
+
+pub fn local_get<S: AsRef<str>>(s: S) -> Instruction {
+    Instruction::LocalGet(LocalGet {
+        idx:   Index::Symbolic(SymbolicIndex::new(s.as_ref().to_owned())),
+        exprs: vec![],
     })
 }
 
@@ -270,14 +279,14 @@ macro_rules! instructions {
 
 instructions!(
     pub enum Instruction {
-        Block     : block      : "block"      { id: Option<Index> },
-        Br        : br         : "br"         { id: Index },
-        BrIf      : br_if      : "br_if"      { id: Index },
-        BrTable   : br_table   : "br_table"   { ids: Index },
-        Call      : call       : "call"       { id: Index },
+        Block     : block      : "block"      { idx: Option<Index> },
+        Br        : br         : "br"         { idx: Index },
+        BrIf      : br_if      : "br_if"      { idx: Index },
+        BrTable   : br_table   : "br_table"   { idxs: Index },
+        Call      : call       : "call"       { idx: Index },
         Drop      : drop       : "drop"       {},
-        GlobalGet : global_get : "global.get" { id: Index },
-        GlobalSet : global_set : "global.set" { id: Index },
+        GlobalGet : global_get : "global.get" { idx: Index },
+        GlobalSet : global_set : "global.set" { idx: Index },
         I32Add    : i32_add    : "i32.add"    {},
         I32Const  : i32_const  : "i32.const"  { integer: Integer },
         I32Eq     : i32_eq     : "i32.eq"     {},
@@ -288,11 +297,11 @@ instructions!(
         I32Sub    : i32_sub    : "i32.sub"    {},
         I64Const  : i64_const  : "i64.const"  { integer: Integer },
         If        : r#if       : "if"         {},
-        Local     : local      : "local"      { id: Index, value_type: ValueType },
-        LocalGet  : local_get  : "local.get"  { id: Index },
-        LocalSet  : local_set  : "local.set"  { id: Index },
-        LocalTee  : local_tee  : "local.tee"  { id: Index },
-        Loop      : r#loop     : "loop"       { id: Option<Index> },
+        Local     : local      : "local"      { idx: Index, value_type: ValueType },
+        LocalGet  : local_get  : "local.get"  { idx: Index },
+        LocalSet  : local_set  : "local.set"  { idx: Index },
+        LocalTee  : local_tee  : "local.tee"  { idx: Index },
+        Loop      : r#loop     : "loop"       { idx: Option<Index> },
         Then      : then       : "then"       {},
     }
 );
