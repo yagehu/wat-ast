@@ -27,10 +27,10 @@ impl AsAtoms for ValueType {
 impl fmt::Display for ValueType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            | Self::I32 => write!(f, "i32"),
-            | Self::I64 => write!(f, "i64"),
-            | Self::F32 => write!(f, "f32"),
-            | Self::F64 => write!(f, "f64"),
+            Self::I32 => write!(f, "i32"),
+            Self::I64 => write!(f, "i64"),
+            Self::F32 => write!(f, "f32"),
+            Self::F64 => write!(f, "f64"),
         }
     }
 }
@@ -73,8 +73,14 @@ impl Peek for ValueType {
 /// https://webassembly.github.io/spec/core/text/types.html#function-types
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FuncType {
-    pub params:  Vec<Param>,
-    pub results: Vec<Result>,
+    params:  Vec<Param>,
+    results: Vec<Result>,
+}
+
+impl FuncType {
+    pub fn new(params: Vec<Param>, results: Vec<Result>) -> Self {
+        Self { params, results }
+    }
 }
 
 impl SExpr for FuncType {
@@ -129,11 +135,15 @@ impl Parse<'_> for FuncType {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Limits {
-    pub min: Integer,
-    pub max: Option<Integer>,
+    min: Integer,
+    max: Option<Integer>,
 }
 
 impl Limits {
+    pub fn new(min: Integer, max: Option<Integer>) -> Self {
+        Self { min, max }
+    }
+
     pub(crate) fn exprs(&self) -> Vec<Expr> {
         let mut v = vec![Expr::Atom(Atom::new(self.min.to_string()))];
 
@@ -156,10 +166,14 @@ impl Parse<'_> for Limits {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MemType {
-    pub lim: Limits,
+    lim: Limits,
 }
 
 impl MemType {
+    pub fn new(lim: Limits) -> Self {
+        Self { lim }
+    }
+
     pub(crate) fn exprs(&self) -> Vec<Expr> {
         self.lim.exprs()
     }
@@ -182,8 +196,8 @@ pub enum GlobalType {
 impl GlobalType {
     pub(crate) fn expr(&self) -> Expr {
         match self {
-            | Self::Mut(m) => Expr::SExpr(Box::new(m.clone())),
-            | Self::NonMut(v) => Expr::Atom(Atom::new(v.to_string())),
+            Self::Mut(m) => Expr::SExpr(Box::new(m.clone())),
+            Self::NonMut(v) => Expr::Atom(Atom::new(v.to_string())),
         }
     }
 }
@@ -202,7 +216,13 @@ impl Parse<'_> for GlobalType {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GlobalTypeMut {
-    pub val_type: ValueType,
+    val_type: ValueType,
+}
+
+impl GlobalTypeMut {
+    pub fn new(val_type: ValueType) -> Self {
+        Self { val_type }
+    }
 }
 
 impl Parse<'_> for GlobalTypeMut {
