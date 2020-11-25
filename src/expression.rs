@@ -1,6 +1,21 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{Atom, Expr, Index, Integer, SExpr, ValueType};
+use crate::{Atom, Expr, Index, Integer, SExpr, Sign, ValueType};
+
+pub fn fold(i: Instruction) -> Expression {
+    Expression::Folded(i)
+}
+
+pub fn i32_const<S: AsRef<str>>(
+    sign: Option<Sign>,
+    s: S,
+    hex: bool,
+) -> Instruction {
+    Instruction::I32Const(I32Const {
+        integer: Integer::new(sign, s.as_ref().to_owned(), hex),
+        exprs:   vec![],
+    })
+}
 
 enum Paren {
     None,
