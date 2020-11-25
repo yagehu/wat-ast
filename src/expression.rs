@@ -306,6 +306,7 @@ instructions!(
         LocalTee   : local_tee   : "local.tee"   { idx: Index },
         Loop       : r#loop      : "loop"        { idx: Option<Index> },
         MemoryGrow : memory_grow : "memory.grow" {},
+        Return     : r#return    : "return"      {},
         Then       : then        : "then"        {},
     }
 );

@@ -4,7 +4,8 @@ pub use expression::{
     fold, global_get, i32_const, local_get, AsAtoms, Block, Br, BrIf, BrTable,
     Call, Drop, Expression, GlobalGet, GlobalSet, I32Add, I32Const, I32Eq,
     I32Eqz, I32GtU, I32LtU, I32Ne, I32RemU, I32ShrU, I32Sub, I64Const, If,
-    Instruction, Local, LocalGet, LocalSet, LocalTee, Loop, MemoryGrow, Then,
+    Instruction, Local, LocalGet, LocalSet, LocalTee, Loop, MemoryGrow, Return,
+    Then,
 };
 pub use import_desc::{ImportDesc, ImportDescFunc};
 pub use index::{Index, Indexes, SymbolicIndex};
