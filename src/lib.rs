@@ -1,6 +1,10 @@
 pub use document::Document;
 pub use export::{Export, InlineExport};
-pub use expression::{AsAtoms, Expression, Instruction};
+pub use expression::{
+    AsAtoms, Block, Br, BrIf, BrTable, Call, Drop, Expression, GlobalGet,
+    GlobalSet, I32Add, I32Const, I32Eq, I32Eqz, I32GtU, I32Ne, I32Sub,
+    I64Const, If, Instruction, Local, LocalGet, LocalSet, LocalTee, Loop, Then,
+};
 pub use import_desc::{ImportDesc, ImportDescFunc};
 pub use index::{Index, Indexes, SymbolicIndex};
 pub use integer::{Integer, Sign};
