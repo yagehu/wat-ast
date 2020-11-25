@@ -302,6 +302,7 @@ instructions!(
         I32LtU     : i32_lt_u    : "i32.lt_u"    {},
         I32Ne      : i32_ne      : "i32.ne"      {},
         I32RemU    : i32_rem_u   : "i32.rem_u"   {},
+        I32ShrU    : i32_shr_u   : "i32.shr_u"   {},
         I32Sub     : i32_sub     : "i32.sub"     {},
         I64Const   : i64_const   : "i64.const"   { integer: Integer },
         If         : r#if        : "if"          {},
