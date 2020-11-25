@@ -358,9 +358,23 @@ impl Parse<'_> for MemorySection {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MemorySectionEntry {
-    pub idx:           Option<Index>,
-    pub inline_export: Option<InlineExport>,
-    pub mem_type:      MemType,
+    idx:           Option<Index>,
+    inline_export: Option<InlineExport>,
+    mem_type:      MemType,
+}
+
+impl MemorySectionEntry {
+    pub fn new(
+        idx: Option<Index>,
+        inline_export: Option<InlineExport>,
+        mem_type: MemType,
+    ) -> Self {
+        Self {
+            idx,
+            inline_export,
+            mem_type,
+        }
+    }
 }
 
 impl SExpr for MemorySectionEntry {
