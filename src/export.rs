@@ -20,7 +20,7 @@ impl SExpr for InlineExport {
     }
 
     fn cdr(&self) -> Vec<Expr> {
-        vec![Expr::Atom(Atom::new(self.name.clone()))]
+        vec![Expr::Atom(Atom::new(format!(r#""{}""#, self.name)))]
     }
 }
 
@@ -53,7 +53,7 @@ impl SExpr for Export {
 
     fn cdr(&self) -> Vec<Expr> {
         vec![
-            Expr::Atom(Atom::new(self.name.clone())),
+            Expr::Atom(Atom::new(format!(r#""{}""#, self.name))),
             Expr::SExpr(Box::new(self.desc.clone())),
         ]
     }
