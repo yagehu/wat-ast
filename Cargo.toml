@@ -1,6 +1,6 @@
 [package]
 name = "wat-ast"
-version = "0.13.0"
+version = "0.13.1"
 authors = ["Yage Hu <yagejhu@gmail.com>"]
 edition = "2018"
 license = "GPL-3.0-or-later"

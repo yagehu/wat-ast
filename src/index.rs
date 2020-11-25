@@ -61,6 +61,15 @@ impl Indexes {
     }
 }
 
+impl IntoIterator for Indexes {
+    type Item = Index;
+    type IntoIter = std::vec::IntoIter<Index>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.idxs.into_iter()
+    }
+}
+
 impl AsAtoms for Indexes {
     fn as_atoms(&self) -> Vec<Atom> {
         self.idxs.iter().map(|i| Atom::new(i.to_string())).collect()
