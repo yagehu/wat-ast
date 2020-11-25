@@ -9,6 +9,10 @@ pub struct NamedValueType {
 }
 
 impl NamedValueType {
+    pub fn new(idx: SymbolicIndex, value_type: ValueType) -> Self {
+        Self { idx, value_type }
+    }
+
     pub fn as_exprs(&self) -> Vec<Expr> {
         self.as_atoms().into_iter().map(|a| Expr::Atom(a)).collect()
     }
