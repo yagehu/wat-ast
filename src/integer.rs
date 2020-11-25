@@ -9,16 +9,16 @@ pub struct Integer {
     pub(crate) sign: Option<Sign>,
     pub(crate) src:  String,
     pub(crate) val:  Option<String>,
-    pub(crate) hex:  bool,
+    pub(crate) hex:  Option<bool>,
 }
 
 impl Integer {
-    pub fn new(sign: Option<Sign>, src: String, hex: bool) -> Self {
+    pub fn new(src: String) -> Self {
         Self {
-            sign,
+            sign: None,
             src,
             val: None,
-            hex,
+            hex: None,
         }
     }
 
@@ -34,8 +34,14 @@ impl Integer {
 
     /// Returns the value string that can be parsed for this integer, as well as
     /// the base that it should be parsed in
-    pub fn val(&self) -> (Option<&String>, u32) {
-        (self.val.as_ref(), if self.hex { 16 } else { 10 })
+    pub fn val(&self) -> (Option<&String>, Option<u32>) {
+        let hex = if let Some(h) = self.hex {
+            Some(if h { 16 } else { 10 })
+        } else {
+            None
+        };
+
+        (self.val.as_ref(), hex)
     }
 }
 
@@ -59,7 +65,7 @@ impl Parse<'_> for Integer {
                 let mut sign = None;
                 let (val_ref, base) = s.val();
                 let val = Some(val_ref.to_owned());
-                let hex = if base == 16 { true } else { false };
+                let hex = Some(if base == 16 { true } else { false });
 
                 if let Some(si) = s.sign() {
                     match si {

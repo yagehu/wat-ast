@@ -1,8 +1,6 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{
-    Atom, Expr, Index, Integer, SExpr, Sign, SymbolicIndex, ValueType,
-};
+use crate::{Atom, Expr, Index, Integer, SExpr, SymbolicIndex, ValueType};
 
 pub fn fold(i: Instruction) -> Expression {
     Expression::Folded(i)
@@ -15,13 +13,9 @@ pub fn global_get<S: AsRef<str>>(s: S) -> Instruction {
     })
 }
 
-pub fn i32_const<S: AsRef<str>>(
-    sign: Option<Sign>,
-    s: S,
-    hex: bool,
-) -> Instruction {
+pub fn i32_const<S: AsRef<str>>(s: S) -> Instruction {
     Instruction::I32Const(I32Const {
-        integer: Integer::new(sign, s.as_ref().to_owned(), hex),
+        integer: Integer::new(s.as_ref().to_owned()),
         exprs:   vec![],
     })
 }

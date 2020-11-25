@@ -115,7 +115,7 @@ impl NumericIndex {
 
     /// Returns the value string that can be parsed for this integer, as well as
     /// the base that it should be parsed in
-    pub fn val(&self) -> (Option<&String>, u32) {
+    pub fn val(&self) -> (Option<&String>, Option<u32>) {
         self.i.val()
     }
 }
@@ -129,22 +129,7 @@ impl AsAtoms for NumericIndex {
 impl Parse<'_> for NumericIndex {
     fn parse(parser: Parser<'_>) -> Result<Self> {
         let span = Some(parser.cur_span());
-        let int = parser.step(|cursor| match cursor.integer() {
-            Some((i, cur)) => Ok((i, cur)),
-            None => Err(cursor.error("not an integer")),
-        })?;
-        let sign = int.sign().map(|s| match s {
-            wast::lexer::SignToken::Plus => Sign::Pos,
-            wast::lexer::SignToken::Minus => Sign::Neg,
-        });
-        let (val, radix) = int.val();
-        let hex = if radix == 16 { true } else { false };
-        let i = Integer {
-            sign,
-            src: int.src().to_owned(),
-            val: Some(val.to_owned()),
-            hex,
-        };
+        let i = parser.parse::<Integer>()?;
 
         Ok(Self { i, span })
     }
