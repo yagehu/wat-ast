@@ -8,6 +8,13 @@ pub fn fold(i: Instruction) -> Expression {
     Expression::Folded(i)
 }
 
+pub fn global_get<S: AsRef<str>>(s: S) -> Instruction {
+    Instruction::GlobalGet(GlobalGet {
+        idx:   Index::Symbolic(SymbolicIndex::new(s.as_ref().to_owned())),
+        exprs: vec![],
+    })
+}
+
 pub fn i32_const<S: AsRef<str>>(
     sign: Option<Sign>,
     s: S,
