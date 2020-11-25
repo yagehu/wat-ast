@@ -269,6 +269,7 @@ instructions!(
         I32Eqz    : i32_eqz    : "i32.eqz"    {},
         I32GtU    : i32_gt_u   : "i32.gt_u"   {},
         I32Ne     : i32_ne     : "i32.ne"     {},
+        I32RemU   : i32_rem_u  : "i32.rem_u"  {},
         I32Sub    : i32_sub    : "i32.sub"    {},
         I64Const  : i64_const  : "i64.const"  { integer: Integer },
         If        : r#if       : "if"         {},
