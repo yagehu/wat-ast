@@ -4,6 +4,10 @@ use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 
 use crate::{AsAtoms, Atom, Integer, Sign};
 
+pub fn symbolic<S: AsRef<str>>(s: S) -> Index {
+    Index::Symbolic(SymbolicIndex::new(s.as_ref().to_owned()))
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Index {
     Numeric(NumericIndex),

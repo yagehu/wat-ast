@@ -8,7 +8,7 @@ pub use expression::{
     Then,
 };
 pub use import_desc::{ImportDesc, ImportDescFunc};
-pub use index::{Index, Indexes, SymbolicIndex};
+pub use index::{symbolic, Index, Indexes, SymbolicIndex};
 pub use integer::{Integer, Sign};
 pub use module::Module;
 pub use named_value_type::NamedValueType;
