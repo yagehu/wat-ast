@@ -456,12 +456,28 @@ impl Parse<'_> for GlobalSection {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GlobalSectionEntry {
-    pub idx:           Option<Index>,
-    pub inline_export: Option<InlineExport>,
-    pub global_type:   GlobalType,
+    idx:           Option<Index>,
+    inline_export: Option<InlineExport>,
+    global_type:   GlobalType,
 
     /// An imported global does not have expr.
-    pub expr: Option<Expression>,
+    expr: Option<Expression>,
+}
+
+impl GlobalSectionEntry {
+    pub fn new(
+        idx: Option<Index>,
+        inline_export: Option<InlineExport>,
+        global_type: GlobalType,
+        expr: Option<Expression>,
+    ) -> Self {
+        Self {
+            idx,
+            inline_export,
+            global_type,
+            expr,
+        }
+    }
 }
 
 impl SExpr for GlobalSectionEntry {
