@@ -99,6 +99,12 @@ impl Peek for Integer {
     }
 }
 
+impl From<i32> for Integer {
+    fn from(i: i32) -> Self {
+        Self::new(i.to_string())
+    }
+}
+
 #[derive(Copy, Debug, Clone, PartialEq, Eq)]
 pub enum Sign {
     Pos,
