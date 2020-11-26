@@ -1,6 +1,8 @@
 use wast::parser::{Parse, Parser, Result};
 
-use crate::{Atom, Expr, Index, Integer, SExpr, SymbolicIndex, ValueType};
+use crate::{
+    Atom, Expr, Index, Indexes, Integer, SExpr, SymbolicIndex, ValueType,
+};
 
 pub fn fold(i: Instruction) -> Expression {
     Expression::Folded(i)
@@ -283,7 +285,7 @@ instructions!(
         Block      : block       : "block"       { idx: Option<Index> },
         Br         : br          : "br"          { idx: Index },
         BrIf       : br_if       : "br_if"       { idx: Index },
-        BrTable    : br_table    : "br_table"    { idxs: Index },
+        BrTable    : br_table    : "br_table"    { idxs: Indexes },
         Call       : call        : "call"        { idx: Index },
         Drop       : drop        : "drop"        {},
         GlobalGet  : global_get  : "global.get"  { idx: Index },
@@ -293,6 +295,8 @@ instructions!(
         I32Eq      : i32_eq      : "i32.eq"      {},
         I32Eqz     : i32_eqz     : "i32.eqz"     {},
         I32GtU     : i32_gt_u    : "i32.gt_u"    {},
+        I32Load    : i32_load    : "i32.load"    {},
+        I32Lt      : i32_lt      : "i32.lt"      {},
         I32LtU     : i32_lt_u    : "i32.lt_u"    {},
         I32Ne      : i32_ne      : "i32.ne"      {},
         I32RemU    : i32_rem_u   : "i32.rem_u"   {},
