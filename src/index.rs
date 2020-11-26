@@ -8,7 +8,7 @@ pub fn symbolic<S: AsRef<str>>(s: S) -> Index {
     Index::Symbolic(SymbolicIndex::new(s.as_ref().to_owned()))
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Index {
     Numeric(NumericIndex),
     Symbolic(SymbolicIndex),
@@ -92,7 +92,7 @@ impl Parse<'_> for Indexes {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NumericIndex {
     i:    Integer,
     span: Option<wast::Span>,
@@ -149,7 +149,7 @@ impl Peek for NumericIndex {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SymbolicIndex {
     name: String,
 

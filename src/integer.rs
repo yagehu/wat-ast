@@ -4,7 +4,7 @@ use wast::parser::{Cursor, Parse, Parser, Peek, Result};
 
 use crate::{AsAtoms, Atom};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Integer {
     pub(crate) sign: Option<Sign>,
     pub(crate) src:  String,
@@ -105,7 +105,7 @@ impl From<i32> for Integer {
     }
 }
 
-#[derive(Copy, Debug, Clone, PartialEq, Eq)]
+#[derive(Copy, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Sign {
     Pos,
     Neg,
