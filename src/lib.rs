@@ -20,7 +20,9 @@ pub use section::{
     MemorySection, MemorySectionEntry, Section, TypeSection, TypeSectionEntry,
 };
 pub use type_use::TypeUse;
-pub use types::{FuncType, GlobalType, Limits, MemType, ValueType};
+pub use types::{
+    FuncType, GlobalType, GlobalTypeMut, Limits, MemType, ValueType,
+};
 
 mod document;
 mod export;
