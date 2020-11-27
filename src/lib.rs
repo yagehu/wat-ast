@@ -17,7 +17,8 @@ pub use result::Result;
 pub use section::{
     DataSection, DataSectionEntry, FunctionSection, FunctionSectionEntry,
     GlobalSection, GlobalSectionEntry, ImportSection, ImportSectionEntry,
-    MemorySection, MemorySectionEntry, Section, TypeSection, TypeSectionEntry,
+    MemorySection, MemorySectionEntry, Offset, Section, TypeSection,
+    TypeSectionEntry,
 };
 pub use type_use::TypeUse;
 pub use types::{
