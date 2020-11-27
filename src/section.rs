@@ -578,6 +578,10 @@ impl Parse<'_> for DataSection {
 pub struct Offset(Expression);
 
 impl Offset {
+    pub fn new(expression: Expression) -> Self {
+        Self(expression)
+    }
+
     pub(crate) fn expr(&self) -> Expr {
         self.0.expr()
     }
