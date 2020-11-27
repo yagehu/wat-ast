@@ -149,7 +149,7 @@ impl Peek for NumericIndex {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct SymbolicIndex {
     name: String,
 
@@ -179,6 +179,14 @@ impl std::hash::Hash for SymbolicIndex {
         self.name.hash(state);
     }
 }
+
+impl PartialEq for SymbolicIndex {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
+}
+
+impl Eq for SymbolicIndex {}
 
 impl fmt::Display for SymbolicIndex {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
