@@ -15,10 +15,10 @@ pub use named_value_type::NamedValueType;
 pub use param::Param;
 pub use result::Result;
 pub use section::{
-    DataSection, DataSectionEntry, FunctionSection, FunctionSectionEntry,
-    GlobalSection, GlobalSectionEntry, ImportSection, ImportSectionEntry,
-    MemorySection, MemorySectionEntry, Offset, Section, TypeSection,
-    TypeSectionEntry,
+    DataSection, DataSectionEntry, DataString, FunctionSection,
+    FunctionSectionEntry, GlobalSection, GlobalSectionEntry, ImportSection,
+    ImportSectionEntry, MemorySection, MemorySectionEntry, Offset, Section,
+    TypeSection, TypeSectionEntry,
 };
 pub use type_use::TypeUse;
 pub use types::{
