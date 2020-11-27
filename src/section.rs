@@ -575,36 +575,17 @@ impl Parse<'_> for DataSection {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Offset {
-    Folded(Expression),
-    Unfolded(Expression),
-}
+pub struct Offset(Expression);
 
 impl Offset {
     pub(crate) fn expr(&self) -> Expr {
-        match self {
-            Self::Folded(e) => e.expr(),
-            Self::Unfolded(e) => e.expr(),
-        }
+        self.0.expr()
     }
 }
 
 impl Parse<'_> for Offset {
     fn parse(parser: Parser<'_>) -> Result<Self> {
-        let mut exprs;
-        let is_folded;
-
-        if parser.peek2::<wast::kw::offset>() {
-            exprs = parser.parens(|p| {
-                p.parse::<wast::kw::offset>()?;
-
-                Ok(ExpressionParser::default().parse(parser)?)
-            })?;
-            is_folded = true;
-        } else {
-            exprs = ExpressionParser::default().parse(parser)?;
-            is_folded = false;
-        }
+        let mut exprs = ExpressionParser::default().parse(parser)?;
 
         if exprs.len() == 0 {
             return Err(parser.error("init_expr is empty"));
@@ -614,11 +595,7 @@ impl Parse<'_> for Offset {
             return Err(parser.error("only one init_expr operator is expected"));
         }
 
-        if is_folded {
-            Ok(Self::Folded(exprs.pop().unwrap()))
-        } else {
-            Ok(Self::Unfolded(exprs.pop().unwrap()))
-        }
+        Ok(Self(exprs.pop().unwrap()))
     }
 }
 
