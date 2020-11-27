@@ -149,7 +149,7 @@ impl Peek for NumericIndex {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SymbolicIndex {
     name: String,
 
@@ -171,6 +171,12 @@ impl SymbolicIndex {
 
     pub fn span(&self) -> Option<wast::Span> {
         self.span
+    }
+}
+
+impl std::hash::Hash for SymbolicIndex {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
     }
 }
 
