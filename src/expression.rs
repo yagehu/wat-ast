@@ -22,6 +22,13 @@ pub fn i32_const<S: AsRef<str>>(s: S) -> Instruction {
     })
 }
 
+pub fn i64_const<S: AsRef<str>>(s: S) -> Instruction {
+    Instruction::I64Const(I64Const {
+        integer: Integer::new(s.as_ref().to_owned()),
+        exprs:   vec![],
+    })
+}
+
 pub fn local_get<S: AsRef<str>>(s: S) -> Instruction {
     Instruction::LocalGet(LocalGet {
         idx:   Index::Symbolic(SymbolicIndex::new(s.as_ref().to_owned())),
