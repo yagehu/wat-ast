@@ -616,7 +616,7 @@ impl DataString {
     pub(crate) fn exprs(&self) -> Vec<Expr> {
         self.strings
             .iter()
-            .map(|s| Expr::Atom(Atom::new(s.clone())))
+            .map(|s| Expr::Atom(Atom::new(format!(r#""{}""#, s))))
             .collect()
     }
 }
