@@ -303,7 +303,7 @@ instructions!(
         I32Eqz     : i32_eqz     : "i32.eqz"     {},
         I32GtU     : i32_gt_u    : "i32.gt_u"    {},
         I32Load    : i32_load    : "i32.load"    {},
-        I32Lt      : i32_lt      : "i32.lt"      {},
+        I32LtS     : i32_lt_s    : "i32.lt_s"      {},
         I32LtU     : i32_lt_u    : "i32.lt_u"    {},
         I32Ne      : i32_ne      : "i32.ne"      {},
         I32RemU    : i32_rem_u   : "i32.rem_u"   {},
