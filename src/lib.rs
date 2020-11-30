@@ -2,7 +2,7 @@ pub use document::Document;
 pub use export::{Export, InlineExport};
 pub use expression::{
     fold, global_get, i32_const, i64_const, local_get, AsAtoms, Block, Br,
-    BrIf, BrTable, Call, Drop, Expression, GlobalGet, GlobalSet, I32Add,
+    BrIf, BrTable, Call, Drop, Else, Expression, GlobalGet, GlobalSet, I32Add,
     I32Const, I32Eq, I32Eqz, I32GtU, I32Load, I32LtS, I32LtU, I32Mul, I32Ne,
     I32RemU, I32ShrU, I32Sub, I64Const, If, Instruction, Local, LocalGet,
     LocalSet, LocalTee, Loop, MemoryGrow, Return, Then,

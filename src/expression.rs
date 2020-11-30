@@ -295,6 +295,7 @@ instructions!(
         BrTable    : br_table    : "br_table"    { idxs: Indexes },
         Call       : call        : "call"        { idx: Index },
         Drop       : drop        : "drop"        {},
+        Else       : r#else      : "else"        {},
         GlobalGet  : global_get  : "global.get"  { idx: Index },
         GlobalSet  : global_set  : "global.set"  { idx: Index },
         I32Add     : i32_add     : "i32.add"     {},
